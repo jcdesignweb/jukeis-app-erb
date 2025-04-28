@@ -90,7 +90,7 @@ To run this project, you will need to add the following environment variables to
 
 1.  **Clone the repository (if it's open source):**
     ```bash
-    git clone <REPOSITORY_URL>
+    git clone https://github.com/jcdesignweb/jukeis-app-erb
     cd jukeis-app-erb
     ```
 
@@ -163,11 +163,10 @@ Once you have run Jukeis, these are the basic steps to start using it:
 * **ERB:** Electron React Boilerplate.
 * **React:** JavaScript library for building user interfaces.
 * **Ant Design:** UI component library for React that provides a set of ready-to-use and styled components.
-* **[Other Libraries/Frameworks you used]:** (e.g., `react-router-dom`, any encryption library, etc.)
 
 ## Contributing
 
-Contributions are welcome. If you find any bugs or have any suggestions for improvement, please open an [issue](https://github.com/your-username/Jukeis/issues) on the GitHub repository.
+Contributions are welcome. If you find any bugs or have any suggestions for improvement, please open an [issue](https://github.com/jcdesignweb/jukeis-app-erb/issues) on the GitHub repository.
 
 If you want to contribute code, please follow these steps:
 
@@ -175,7 +174,7 @@ If you want to contribute code, please follow these steps:
 2.  Create a feature branch (`git checkout -b feature/new-feature`).
 3.  Commit your changes (`git commit -m 'Add new feature'`).
 4.  Push to the branch (`git push origin feature/new-feature`).
-5.  Open a [pull request](https://github.com/your-username/Jukeis/pulls) on the original repository.
+5.  Open a [pull request](https://github.com/jcdesignweb/jukeis-app-erb/pulls) on the original repository.
 
 ## License
 
