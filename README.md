@@ -72,12 +72,26 @@ Follow these steps to install and run Jukeis on your system.
 * **Node.js** (version >= 16.0.0 recommended): Required to run development scripts and build the application. You can download it from [https://nodejs.org/](https://nodejs.org/).
 * **npm** or **yarn**: Package managers for Node.js. They usually come installed with Node.js.
 
+#### Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file else the project will fail
+
+
+`GOOGLE_CLIENT_ID` your google client id (you must create an application at https://console.cloud.google.com/)
+
+`GOOGLE_CLIENT_SECRET` your google client secret app
+
+`GOOGLE_REDIRECT_URI` redirect callback for Oauth2
+
+`ENCRYPTION_KEY` encription hash master key Example: 'fBcDeFgHiJKLmNooqZsTuVwXyZ019124'
+
+
 ### Installation
 
 1.  **Clone the repository (if it's open source):**
     ```bash
     git clone <REPOSITORY_URL>
-    cd Jukeis
+    cd jukeis-app-erb
     ```
 
 2.  **Install dependencies:**
@@ -167,11 +181,11 @@ If you want to contribute code, please follow these steps:
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). See the `LICENSE` file in the root of the repository for more details.
 
-## Contact
+## Author
 
-*[If you want to provide a way to contact you:]*
+- [Juan Andrés Carmena](https://github.com/jcdesignweb)
 
-You can contact me via [your email address] or [your LinkedIn profile/other platform].
+You can contact me via [Gmail](juan14nob@gmail.com) or [Linkedin](https://www.linkedin.com/in/jcarmena/).
 
 
 

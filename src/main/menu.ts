@@ -259,7 +259,9 @@ export default class MenuBuilder {
           {
             label: t('menu.help.learn-more'),
             click() {
-              shell.openExternal('https://github.com/jcdesignweb/jukeis-app-erb');
+              shell.openExternal(
+                'https://github.com/jcdesignweb/jukeis-app-erb',
+              );
             },
           },
         ],

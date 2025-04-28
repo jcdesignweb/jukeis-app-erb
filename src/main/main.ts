@@ -270,8 +270,6 @@ const createWindow = async () => {
         userData: await getUserData(),
       });
     }
-
-
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
@@ -290,8 +288,6 @@ const createWindow = async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
-
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
