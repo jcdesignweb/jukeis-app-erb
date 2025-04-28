@@ -4,6 +4,7 @@ import { StoreKey } from '../main/data/storage';
 declare global {
   interface Window {
     electron: {
+      googleClientId: string;
       openExternal: (url: string) => void;
 
       ipcRenderer: {

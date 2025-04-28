@@ -76,7 +76,7 @@ export const AddGroupModal: React.FC<AddGroupModalProps> = ({
         <Form.Item
           label={t('modal.group-creator.group')}
           name="group"
-          style={{ width: '100%' }} // Aplicar estilo al Form.Item
+          style={{ width: '100%' }}
           rules={[
             {
               required: true,

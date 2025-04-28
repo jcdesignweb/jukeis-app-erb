@@ -47,10 +47,6 @@ export class LocalStorage {
   async saveFromDrive(data: Buffer): Promise<void> {
     try {
       await fs.writeFile(dataFilePath, data);
-
-      // @TODO esto debe ir
-      // const encryptedData = encrypt(jsonData);
-      // await fs.writeFile(dataFilePath, encryptedData, 'utf-8');
     } catch (error: unknown) {
       console.error('Error saving data:', error);
       throw error;

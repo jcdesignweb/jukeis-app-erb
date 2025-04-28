@@ -16,6 +16,7 @@ import { resolveHtmlPath } from './utils';
 import MenuBuilder from './menu';
 import { Group, localStorage, StoredData } from './data/storage';
 import { clearToken, getToken, getUserData } from './session';
+import * as config from './config';
 import {
   handleAuthorizationCode,
   redirectUri,
@@ -170,7 +171,7 @@ ipcMain.handle('add-group', async (_, newGroup: Group) => {
     }
   }
 
-  const updatedGroups = [...(storedData.groups ?? []), newGroup]; // Simplemente añadiendo al array por ahora
+  const updatedGroups = [...(storedData.groups ?? []), newGroup];
   const updatedStoredData: StoredData = {
     ...storedData,
     groups: updatedGroups,
@@ -242,6 +243,7 @@ const createWindow = async () => {
     title: 'Jukeis',
     icon: getAssetPath('icon.png'),
     webPreferences: {
+      additionalArguments: [`--googleClientId=${config.google.googleClientId}`],
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
@@ -289,7 +291,6 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
     return { action: 'deny' };

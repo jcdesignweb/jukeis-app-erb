@@ -120,22 +120,20 @@ describe('handleAuthorizationCode', () => {
   });
 
   it('should handle fetch errors gracefully', async () => {
-    // Preparar el mock de fetch para que falle
     (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
-      .mockImplementation(() => {}); // Para evitar que se muestre el error
+      .mockImplementation(() => {});
 
     await handleAuthorizationCode(authorizationCode);
 
-    // Verificar que se ha llamado console.error en caso de error
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'GoogleToken error',
       expect.any(Error),
     );
 
-    consoleErrorSpy.mockRestore(); // Restaurar el comportamiento original de console.error
+    consoleErrorSpy.mockRestore();
   });
 
   it('should call fetch with the correct parameters', async () => {

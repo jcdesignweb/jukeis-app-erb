@@ -1,12 +1,11 @@
-// SplashScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../../../assets/logo.png'; // Importa tu logo
+import logo from '../../../../assets/logo.png';
 import Login from './Login';
 import { useAuth } from '../../contexts/AuthContext';
 
-import './SplashScreen.css'; // Archivo CSS para estilos y animaciones
+import './SplashScreen.css';
 
 interface SplashScreenProps {}
 
@@ -37,7 +36,6 @@ const SplashScreen: React.FC<SplashScreenProps> = () => {
           <div className="logo-animation-container">
             <div className="logo-background-oval">
               {' '}
-              {/* Envolviendo el logo */}
               <img src={logo} alt="Jukeis Logo" className="logo-splash" />
             </div>
           </div>

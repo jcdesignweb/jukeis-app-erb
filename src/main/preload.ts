@@ -13,7 +13,13 @@ export type Channels =
   | 'load-groups'
   | 'delete-group';
 
+const googleClientIdArg = process.argv.find((arg) =>
+  arg.startsWith('--googleClientId='),
+);
+const googleClientId = googleClientIdArg ? googleClientIdArg.split('=')[1] : '';
+
 const electronHandler = {
+  googleClientId,
   openExternal: (url: string) => {
     ipcRenderer.send('start-google-login');
   },
@@ -21,12 +27,11 @@ const electronHandler = {
   ipcRenderer: {
     sendMessage(channel: Channels, ...args: unknown[]) {
       return ipcRenderer.invoke(channel, ...args);
-      // return ipcRenderer.send(channel, ...args);
     },
 
     on: (channel: Channels, func: any) => {
       ipcRenderer.on(channel, (_event, ...args) => {
-        func(_event, ...args); // <- ¡asegúrate de pasar args!
+        func(_event, ...args);
       });
     },
 

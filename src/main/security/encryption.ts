@@ -1,10 +1,7 @@
 import crypto from 'crypto';
 import { encriptionKey } from '../config';
 
-// ¡PELIGRO! En una aplicación real, NUNCA codifiques la clave directamente en el código.
-// Esto es solo para simplificar en esta etapa de desarrollo.
-
-const IV_LENGTH = 16; // Para aes-256-cbc, el IV length es 16 bytes
+const IV_LENGTH = 16; // for aes-256-cbc, the IV length is 16 bytes
 
 export const encrypt = (text: string): string => {
   const iv = crypto.randomBytes(IV_LENGTH);

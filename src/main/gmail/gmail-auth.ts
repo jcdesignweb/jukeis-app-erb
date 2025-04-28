@@ -5,8 +5,9 @@ import { BrowserWindow } from 'electron';
 import { saveToken, saveUserData } from '../session';
 import { downloadUserFileFromDrive } from './drive-storage';
 import { localStorage } from '../data/storage';
-import { google, isDev } from '../config';
+
 import { rootFolder } from '../utils';
+import { google, isDev } from '../config';
 
 let authWindow: BrowserWindow;
 

@@ -6,12 +6,9 @@ import { useAuth } from '../../contexts/AuthContext';
 
 import logo from '../../../../assets/logo.png';
 
-const googleClientId =
-  '523063375722-qae7sbfrl126g498ui9kdg2inprj9558.apps.googleusercontent.com';
 const redirectUri = 'http://localhost:51739';
 const scope =
   'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
-// const scope = 'openid email profile';
 const authorizationEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
 const responseType = 'code';
 const accessType = 'offline';
@@ -22,6 +19,10 @@ const Login: React.FC<LoginProps> = () => {
   const { login } = useAuth();
 
   const navigate = useNavigate();
+
+  const googleClientId = (window as any).electron?.googleClientId;
+
+  console.log('GoogleClientID', googleClientId);
 
   useEffect(() => {
     window.electron.ipcRenderer.on('login-success', (_event, data: any) => {

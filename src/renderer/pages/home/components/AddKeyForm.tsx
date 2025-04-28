@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 
-interface AddKeyFormProps {
-  onAddKey?: (newKey: { description: string; key: string }) => void; // onAddKey ahora es opcional
-}
-
-const AddKeyForm: React.FC<AddKeyFormProps> = ({ onAddKey }) => {
+const AddKeyForm: React.FC = () => {
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
 

@@ -69,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded }) => {
 
       setUser({
         name: session.userData?.name || 'Usuario',
-        picture: session.userData?.picture || '', // URL de Google
+        picture: session.userData?.picture || '',
       });
     };
 

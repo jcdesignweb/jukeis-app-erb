@@ -45,7 +45,7 @@ describe('Google Drive functions', () => {
         },
       });
 
-      const mockFileData = new ArrayBuffer(8); // Simulamos datos
+      const mockFileData = new ArrayBuffer(8);
       driveMock.files.get.mockResolvedValue({
         data: mockFileData,
       });
