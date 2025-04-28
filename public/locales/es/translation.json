@@ -1,0 +1,73 @@
+{
+  "appTitle": "Administrador de Claves Seguras",
+  "addKey": "Agregar Nueva Clave",
+  "keyLabel": "Clave",
+  "passwordLabel": "Contraseña",
+  "submitButton": "Guardar",
+  "deleteConfirmation": "¿Estás seguro de que quieres eliminar esta clave?",
+  "yes": "Sí",
+  "no": "No",
+  "ok": "ok",
+  "cancel": "Cancelar",
+  "logout": "Salir",
+  "home": {
+    "title":"Contraseñas almacenadas",
+    "no-keys": "No se encontraron claves almacenadas",
+    "all-groups": "Todos los grupos",
+    "no-group": "Sin grupo",
+    "filter-by-group": "Filtrar por grupo",
+    "filter-by-origin": "Filtrar por descripción"
+  },
+  "profile": {
+    "title": "Mi perfil"
+  },
+  "groups": {
+    "addGroupButton": "Crear Grupo",
+    "title": "Grupos",
+    "filterBy": "Filtrar por nombre"
+  },
+  "create": "Crear",
+  "createKey": "Crear nueva",
+  "sidebar": {
+
+    "home": "Inicio",
+    "groups": "Grupos"
+  },
+  "menu": {
+    "file": {
+      "menu-label": "Archivo",
+      "open": "Abrir",
+      "close": "Cerrar"
+    },
+    "view": {
+      "menu-label": "Vista"
+    },
+    "help": {
+      "menu-label": "Ayuda",
+      "learn-more": "Leer mas",
+      "about-me": "Acerca de mi"
+    }
+  },
+  "modal": {
+    "delete-item": {
+      "title": "Eliminar item",
+      "message": "¿Estás seguro que deseas eliminar?"
+    },
+    "group-creator": {
+      "group": "Nombre para el grupo",
+      "group-required": "Por favor, ingresa el Nombre de Grupo",
+      "group-exists": "Grupo existente, elija otro nombre"
+    },
+    "creator": {
+      "title": "Crear nueva",
+      "origin": "Origen (descripcion)",
+      "group": "Grupo",
+      "password": "Contraseña",
+      "password-required": "Por favor, ingresa el valor",
+      "origin-required": "'Por favor, ingresa el KeyName",
+      "select-placeholder": "Seleccione un grupo",
+      "select-add-item": "Ingrese un valor"
+    }
+  }
+
+}

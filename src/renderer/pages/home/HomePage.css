@@ -1,0 +1,6 @@
+.logo-header {
+  width: 180px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Iniciando Sesión...</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@4/dist/antd.min.css" /> <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5; /* Fondo gris claro de Ant Design */
+        }
+        .container {
+            background-color: #fff;
+            padding: 48px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        .loader-text {
+            margin-top: 24px;
+            color: rgba(0, 0, 0, 0.85);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loader-container">
+            </div>
+        <p class="loader-text">Iniciando sesión con Google...</p>
+        <p class="loader-text">Por favor, espera un momento.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
+
+    <!-- Importar AntD de CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/antd@4/dist/antd.min.js"></script>
+
+    <script>
+        // Este script recibirá el código de autorización y lo enviará al proceso principal
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (code) {
+            window.electronAPI.handleAuthorizationCode(code); // Asumiendo que tienes un bridge API llamado electronAPI
+        } else if (urlParams.get('error')) {
+            console.error('Error en la autenticación de Google:', urlParams.get('error'));
+            // Aquí podrías mostrar un mensaje de error al usuario
+        }
+
+
+    </script>
+
+<script>
+  ReactDOM.render(
+    React.createElement(
+      antd.Spin,
+      {
+        size: 'large',
+        tip: '',
+        spinning: true
+      },
+      null
+    ),
+    document.getElementById('loader-container')
+  );
+</script>
+</body>
+</html>

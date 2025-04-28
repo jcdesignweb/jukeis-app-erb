@@ -1,0 +1,81 @@
+/* SplashScreen.css */
+.splash-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fde0b6, #fca652); /* Ejemplo de degradado naranja */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.logo-animation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Estilos iniciales para la animación */
+  opacity: 0;
+  transform: translate(-50vw, 0) scale(0.2); /* Aparece desde la izquierda y pequeño */
+  animation: aparecerLogoContainer 1.2s ease-out forwards; /* Animación principal */
+}
+
+.logo-background-oval {
+  background-color: transparent;
+  border-radius: 50%;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 202px;
+  height: 202px;
+}
+
+.logo-splash {
+  width: 180px;
+}
+
+@keyframes aparecerLogoContainer {
+  0% {
+    opacity: 0;
+    transform: translate(-50vw, 0) scale(0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes logoBounce {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-20px);
+  }
+}
+
+.login-container {
+  min-height: 100vh;
+  background-color: #f4f4f4; /* Ejemplo de fondo para el login */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  padding: 32px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+}
+
+.logo-background-oval.logo-background-login {
+  width: 112px;
+  height: 112px;
+  padding: 8px;
+}
+
+.logo-login {
+  width: 80px;
+}

@@ -1,0 +1,10 @@
+{
+  "appTitle": "Secure Key Manager",
+  "addKey": "Add New Key",
+  "keyLabel": "Key",
+  "passwordLabel": "Password",
+  "submitButton": "Submit",
+  "deleteConfirmation": "Are you sure want to delete this key?",
+  "yes": "Yes",
+  "no": "No"
+}
