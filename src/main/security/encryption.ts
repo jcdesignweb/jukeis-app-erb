@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { encriptionKey } from '../config';
+import config from '../config';
 
 const IV_LENGTH = 16; // for aes-256-cbc, the IV length is 16 bytes
 
@@ -7,7 +7,7 @@ export const encrypt = (text: string): string => {
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(
     'aes-256-cbc',
-    Buffer.from(encriptionKey, 'utf-8'),
+    Buffer.from(config.encriptionKey, 'utf-8'),
     iv,
   );
   let encrypted = cipher.update(text, 'utf-8', 'hex');
@@ -22,7 +22,7 @@ export const decrypt = (encryptedText: string): string => {
 
   const decipher = crypto.createDecipheriv(
     'aes-256-cbc',
-    Buffer.from(encriptionKey, 'utf-8'),
+    Buffer.from(config.encriptionKey, 'utf-8'),
     iv,
   );
 

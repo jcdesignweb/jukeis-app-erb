@@ -10,13 +10,14 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import dotenv from 'dotenv';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { resolveHtmlPath } from './utils';
 import MenuBuilder from './menu';
 import { Group, localStorage, StoredData } from './data/storage';
 import { clearToken, getToken, getUserData } from './session';
-import * as config from './config';
+import config, { getEnvFilePath, verifyEnvVars } from './config';
 import {
   handleAuthorizationCode,
   redirectUri,
@@ -32,6 +33,10 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
+
+const envPath = getEnvFilePath(app.isPackaged);
+dotenv.config({ path: envPath });
+verifyEnvVars();
 
 class AppUpdater {
   constructor() {
@@ -275,10 +280,12 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
+    console.log('CODEEEEEE url', url);
     if (url.startsWith(redirectUri)) {
       event.preventDefault();
       const urlParams = new URLSearchParams(url.split('?')[1]);
       const code = urlParams.get('code');
+
       if (code) {
         handleAuthorizationCode(code);
       } else {

@@ -44,6 +44,7 @@ const configuration: webpack.Configuration = {
   },
 
   plugins: [
+
     new webpack.DllPlugin({
       path: path.join(dist, '[name].json'),
       name: '[name]',

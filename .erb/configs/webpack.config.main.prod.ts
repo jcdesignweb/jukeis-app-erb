@@ -11,12 +11,9 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
-import { DefinePlugin } from 'webpack';
 
 checkNodeEnv('production');
 deleteSourceMaps();
-
-
 
 const configuration: webpack.Configuration = {
   devtool: 'source-map',
@@ -47,12 +44,6 @@ const configuration: webpack.Configuration = {
   },
 
   plugins: [
-    new DefinePlugin({
-      'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
-      'process.env.GOOGLE_CLIENT_SECRET': JSON.stringify(process.env.GOOGLE_CLIENT_SECRET),
-      'process.env.GOOGLE_REDIRECT_URI': JSON.stringify(process.env.GOOGLE_REDIRECT_URI),
-      'process.env.ENCRYPTION_KEY': JSON.stringify(process.env.ENCRYPTION_KEY),
-    }),
 
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
@@ -70,11 +61,13 @@ const configuration: webpack.Configuration = {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
+      GOOGLE_CLIENT_ID: 'xxxx',
       DEBUG_PROD: false,
       START_MINIMIZED: false,
     }),
 
     new webpack.DefinePlugin({
+      'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
       'process.type': '"browser"',
     }),
   ],

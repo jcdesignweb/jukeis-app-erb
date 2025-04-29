@@ -1,5 +1,10 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+
+export function getEnvFilePath(isPackaged: boolean): string {
+  return isPackaged
+    ? path.join(process.resourcesPath, '.env')
+    : path.resolve(process.cwd(), '.env');
+}
 
 const requiredEnvVars = [
   'GOOGLE_CLIENT_ID',
@@ -8,14 +13,12 @@ const requiredEnvVars = [
   'ENCRYPTION_KEY',
 ];
 
-const verify = () => {
+export const verifyEnvVars = () => {
   for (const env of requiredEnvVars) {
     if (process.env[env] === undefined)
       throw new Error(`${env} environment var is missing`);
   }
 };
-
-verify();
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID!;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET!;
@@ -30,4 +33,4 @@ const google = {
   googleRedirectUri,
 };
 
-export { google, isDev, encriptionKey };
+export default { google, isDev, encriptionKey };

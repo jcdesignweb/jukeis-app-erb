@@ -2,12 +2,12 @@
 import { app } from 'electron';
 import { URL } from 'url';
 import path from 'path';
-import { isDev } from './config';
+import config from './config';
 
 export const DATA_FILE_NAME = 'encrypted_data.json';
 
 export function resolveHtmlPath(htmlFileName: string) {
-  if (isDev) {
+  if (config.isDev) {
     const port = process.env.PORT || 1212;
     const url = new URL(`http://localhost:${port}`);
     url.pathname = htmlFileName;

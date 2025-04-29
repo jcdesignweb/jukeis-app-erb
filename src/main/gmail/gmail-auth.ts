@@ -1,4 +1,3 @@
-import axios from 'axios';
 import path from 'path';
 import express from 'express';
 import { BrowserWindow } from 'electron';
@@ -7,17 +6,17 @@ import { downloadUserFileFromDrive } from './drive-storage';
 import { localStorage } from '../data/storage';
 
 import { rootFolder } from '../utils';
-import { google, isDev } from '../config';
+import config from '../config';
 
 let authWindow: BrowserWindow;
 
 const PORT = 51739;
 
-const googleClientId = google.googleClientId;
-const googleClientSecret = google.googleClientSecret;
-export const redirectUri = google.googleRedirectUri;
+const googleClientId = config.google.googleClientId;
+const googleClientSecret = config.google.googleClientSecret;
+export const redirectUri = config.google.googleRedirectUri;
 
-const oathCallbackFile = isDev
+const oathCallbackFile = config.isDev
   ? path.join(rootFolder(), './assets/html/oauth_callback.html')
   : path.join(process.resourcesPath, 'assets/html/oauth_callback.html');
 
@@ -29,9 +28,10 @@ export function startGoogleLoginFlow(mainWindow: BrowserWindow) {
     const code = req.query.code as string;
 
     res.sendFile(oathCallbackFile);
-    const { userInfo, tokens } = await exchangeCodeForToken(code, mainWindow);
+    const { userInfo, tokens } = await exchangeCodeForToken(code);
 
     await saveUserData(JSON.stringify(userInfo));
+
     const fileData = await downloadUserFileFromDrive(tokens.access_token);
     if (fileData) {
       await localStorage.saveFromDrive(fileData);
@@ -70,32 +70,40 @@ export function startGoogleLoginFlow(mainWindow: BrowserWindow) {
 
 async function exchangeCodeForToken(
   code: string,
-  mainWindow: BrowserWindow,
 ): Promise<{ userInfo: any; tokens: any }> {
-  const res = await axios.post('https://oauth2.googleapis.com/token', {
-    code,
-    client_id: googleClientId,
-    client_secret: googleClientSecret,
-    redirect_uri: `http://localhost:${PORT}`,
-    grant_type: 'authorization_code',
+  const params = new URLSearchParams();
+  params.append('grant_type', 'authorization_code');
+  params.append('code', code);
+  params.append('client_id', googleClientId);
+  params.append('client_secret', googleClientSecret);
+  params.append('redirect_uri', `http://localhost:${PORT}`);
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
   });
 
-  const tokens = res.data;
-
+  const tokens = await res.json();
   const accessToken = tokens.access_token;
   await saveToken(accessToken);
 
-  const userInfo = await axios.get(
+  const userInfoResponse = await fetch(
     'https://www.googleapis.com/oauth2/v2/userinfo',
     {
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${tokens.access_token}`,
       },
     },
   );
 
+  const userInfo = await userInfoResponse.json();
+
   return {
-    userInfo: userInfo.data,
+    userInfo,
     tokens,
   };
 }

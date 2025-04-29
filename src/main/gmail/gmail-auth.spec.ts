@@ -11,9 +11,8 @@ jest.mock('express', () => {
 });
 import { handleAuthorizationCode, startGoogleLoginFlow } from './gmail-auth';
 import { BrowserWindow } from 'electron';
-import axios from 'axios';
 
-jest.mock('axios');
+jest.mock('../config');
 jest.mock('../session');
 jest.mock('./drive-storage');
 jest.mock('../data/storage', () => ({
@@ -35,6 +34,13 @@ jest.mock('electron', () => ({
 global.fetch = jest.fn();
 
 import express from 'express';
+
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({
+  path: path.resolve(process.cwd(), '.env'),
+});
 
 describe('google-login-flow', () => {
   let appMock: any;
@@ -70,8 +76,10 @@ describe('google-login-flow', () => {
     const fakeTokens = { access_token: 'fake-token' };
     const fakeUserInfo = { id: 'user123', email: 'test@example.com' };
 
-    (axios.post as jest.Mock).mockResolvedValue({ data: fakeTokens });
-    (axios.get as jest.Mock).mockResolvedValue({ data: fakeUserInfo });
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ fakeTokens, fakeUserInfo }),
+    });
 
     startGoogleLoginFlow(mainWindow);
     expect(appMock.get).toHaveBeenCalledWith('/', expect.any(Function));
