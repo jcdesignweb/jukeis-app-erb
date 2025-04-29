@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import config from '../config';
+import { config } from '../config';
 
 const IV_LENGTH = 16; // for aes-256-cbc, the IV length is 16 bytes
 

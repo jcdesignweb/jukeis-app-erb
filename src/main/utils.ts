@@ -2,7 +2,7 @@
 import { app } from 'electron';
 import { URL } from 'url';
 import path from 'path';
-import config from './config';
+import { config } from './config';
 
 export const DATA_FILE_NAME = 'encrypted_data.json';
 
@@ -25,4 +25,10 @@ export const rootFolder = (): string => {
 export function getDataFilePath(): string {
   const userDataPath = app.getPath('userData');
   return path.join(userDataPath, DATA_FILE_NAME);
+}
+
+export function getEnvFilePath(isPackaged: boolean): string {
+  return isPackaged
+    ? path.join(process.resourcesPath, '.env')
+    : path.resolve(process.cwd(), '.env');
 }

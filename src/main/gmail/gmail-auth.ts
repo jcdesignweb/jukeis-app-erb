@@ -6,7 +6,7 @@ import { downloadUserFileFromDrive } from './drive-storage';
 import { localStorage } from '../data/storage';
 
 import { rootFolder } from '../utils';
-import config from '../config';
+import { config } from '../config';
 
 let authWindow: BrowserWindow;
 

@@ -46,6 +46,12 @@ Jukeis is a secure and easy-to-use desktop application for storing and managing 
 * **Quick Search:** Find your passwords quickly with the search function. *(If you implemented it)*
 * **Easy Copying:** Option to securely copy passwords to the clipboard.
 
+## Snap install (Linux Os)
+
+If you  are using Linux Os, you can install it using snap. Today [29-04-2025] is in proccess of registration, but it should be done soon. you can try it using the next command:
+
+`sudo snap install jukeis `
+
 ## Screenshots
 
 *[Here you could add some screenshots of the application in action. This visually helps users understand what Jukeis looks like.]*

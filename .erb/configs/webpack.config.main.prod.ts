@@ -61,13 +61,11 @@ const configuration: webpack.Configuration = {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
-      GOOGLE_CLIENT_ID: 'xxxx',
       DEBUG_PROD: false,
       START_MINIMIZED: false,
     }),
 
     new webpack.DefinePlugin({
-      'process.env.GOOGLE_CLIENT_ID': JSON.stringify(process.env.GOOGLE_CLIENT_ID),
       'process.type': '"browser"',
     }),
   ],

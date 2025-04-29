@@ -8,16 +8,24 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
+
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { getEnvFilePath, resolveHtmlPath } from './utils';
 import dotenv from 'dotenv';
+
+import { config, initConfig } from './config';
+dotenv.config({ path: getEnvFilePath(app.isPackaged) });
+
+initConfig();
+
+import path from 'path';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import { resolveHtmlPath } from './utils';
+
 import MenuBuilder from './menu';
 import { Group, localStorage, StoredData } from './data/storage';
 import { clearToken, getToken, getUserData } from './session';
-import config, { getEnvFilePath, verifyEnvVars } from './config';
+
 import {
   handleAuthorizationCode,
   redirectUri,
@@ -33,10 +41,6 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
-
-const envPath = getEnvFilePath(app.isPackaged);
-dotenv.config({ path: envPath });
-verifyEnvVars();
 
 class AppUpdater {
   constructor() {
@@ -280,7 +284,6 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    console.log('CODEEEEEE url', url);
     if (url.startsWith(redirectUri)) {
       event.preventDefault();
       const urlParams = new URLSearchParams(url.split('?')[1]);

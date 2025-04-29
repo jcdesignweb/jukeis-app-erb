@@ -1,11 +1,3 @@
-import path from 'path';
-
-export function getEnvFilePath(isPackaged: boolean): string {
-  return isPackaged
-    ? path.join(process.resourcesPath, '.env')
-    : path.resolve(process.cwd(), '.env');
-}
-
 const requiredEnvVars = [
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
@@ -13,7 +5,7 @@ const requiredEnvVars = [
   'ENCRYPTION_KEY',
 ];
 
-export const verifyEnvVars = () => {
+const verifyEnvVars = () => {
   for (const env of requiredEnvVars) {
     if (process.env[env] === undefined)
       throw new Error(`${env} environment var is missing`);
@@ -33,4 +25,23 @@ const google = {
   googleRedirectUri,
 };
 
-export default { google, isDev, encriptionKey };
+export const getConfig = () => {
+  verifyEnvVars();
+
+  return {
+    google: {
+      googleClientId: process.env.GOOGLE_CLIENT_ID!,
+      googleClientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      googleRedirectUri: process.env.GOOGLE_REDIRECT_URI!,
+    },
+    isDev: process.env.NODE_ENV !== 'production',
+    encriptionKey: process.env.ENCRYPTION_KEY!,
+  };
+};
+
+let config: ReturnType<typeof getConfig>;
+export const initConfig = () => {
+  config = getConfig();
+};
+
+export { config };

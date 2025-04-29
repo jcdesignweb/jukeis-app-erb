@@ -22,8 +22,6 @@ const Login: React.FC<LoginProps> = () => {
 
   const googleClientId = (window as any).electron?.googleClientId;
 
-  console.log('GoogleClientID', googleClientId);
-
   useEffect(() => {
     window.electron.ipcRenderer.on('login-success', (_event, data: any) => {
       if (data) {

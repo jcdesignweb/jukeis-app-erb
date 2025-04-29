@@ -12,7 +12,6 @@ jest.mock('express', () => {
 import { handleAuthorizationCode, startGoogleLoginFlow } from './gmail-auth';
 import { BrowserWindow } from 'electron';
 
-jest.mock('../config');
 jest.mock('../session');
 jest.mock('./drive-storage');
 jest.mock('../data/storage', () => ({
@@ -20,6 +19,23 @@ jest.mock('../data/storage', () => ({
     saveFromDrive: jest.fn(),
   },
 }));
+
+jest.mock('../config', () => {
+  const actual = jest.requireActual('../config');
+  return {
+    ...actual,
+    config: {
+      google: {
+        googleClientId: 'mock-client-id',
+        googleClientSecret: 'mock-secret',
+        googleRedirectUri: 'http://localhost:3000/oauth2callback',
+      },
+      isDev: true,
+      encriptionKey: 'mock-encryption-key',
+    },
+    initConfig: jest.fn(),
+  };
+});
 
 jest.mock('electron', () => ({
   BrowserWindow: jest.fn().mockImplementation(() => ({
@@ -37,10 +53,9 @@ import express from 'express';
 
 import dotenv from 'dotenv';
 import path from 'path';
+import { initConfig } from '../config';
 
-dotenv.config({
-  path: path.resolve(process.cwd(), '.env'),
-});
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 describe('google-login-flow', () => {
   let appMock: any;
@@ -48,6 +63,8 @@ describe('google-login-flow', () => {
   let authWindowMock: any;
 
   beforeEach(() => {
+    initConfig();
+
     jest.useFakeTimers();
     jest.clearAllMocks();
 
