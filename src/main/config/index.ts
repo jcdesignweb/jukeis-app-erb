@@ -12,19 +12,6 @@ const verifyEnvVars = () => {
   }
 };
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID!;
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET!;
-const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI!;
-const encriptionKey = process.env.ENCRYPTION_KEY!;
-
-const isDev = process.env.NODE_ENV !== 'production';
-
-const google = {
-  googleClientId,
-  googleClientSecret,
-  googleRedirectUri,
-};
-
 export const getConfig = () => {
   verifyEnvVars();
 

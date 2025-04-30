@@ -30,12 +30,12 @@ import {
   handleAuthorizationCode,
   redirectUri,
   startGoogleLoginFlow,
-} from './gmail/gmail-auth';
+} from './google/gmail-auth';
 import { encrypt } from './security/encryption';
 import {
   downloadUserFileFromDrive,
   uploadToDrive,
-} from './gmail/drive-storage';
+} from './google/drive-storage';
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
