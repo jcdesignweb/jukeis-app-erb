@@ -10,7 +10,8 @@
 Jukeis is a secure and easy-to-use desktop application for storing and managing your passwords locally. Forget having to remember multiple complex keys: with Jukeis, you only need to remember one master password to access all the others.
 </p>
 
- [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![jukeis](https://snapcraft.io/jukeis/badge.svg)](https://snapcraft.io/jukeis)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platforms](https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://www.electronjs.org/)
 [![Technologies](https://img.shields.io/badge/Tech-Electron%20%7C%20ERB%7C%20React%20%7C%20Ant%20Design-blue)](https://www.electronjs.org/)
 [![Status](https://img.shields.io/badge/Status-In%20Development-orange)](https://shields.io/) 

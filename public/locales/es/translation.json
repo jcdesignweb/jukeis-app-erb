@@ -43,6 +43,10 @@
       "menu-label": "Vista"
     },
     "help": {
+      "version": {
+        "menu-label": "Version",
+        "title": "Versión de la aplicación"
+      },
       "menu-label": "Ayuda",
       "learn-more": "Leer mas",
       "about-me": "Acerca de mi"

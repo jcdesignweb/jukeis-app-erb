@@ -4,6 +4,7 @@ import {
   shell,
   BrowserWindow,
   MenuItemConstructorOptions,
+  dialog,
 } from 'electron';
 import { t } from 'i18next';
 
@@ -262,6 +263,17 @@ export default class MenuBuilder {
               shell.openExternal(
                 'https://github.com/jcdesignweb/jukeis-app-erb',
               );
+            },
+          },
+          {
+            label: t('menu.help.version.menu-label'),
+            click: () => {
+              dialog.showMessageBox({
+                type: 'info',
+                title: t('menu.help.version.title'),
+                message: `Versión: ${app.getVersion()}`,
+                buttons: ['OK'],
+              });
             },
           },
         ],

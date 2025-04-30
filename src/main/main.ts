@@ -132,7 +132,7 @@ ipcMain.handle('add-new-key', async (event, newKey) => {
 });
 
 ipcMain.handle('delete-key', async (event, keyId) => {
-  const result = await localStorage.delete(keyId);
+  const result = await localStorage.deleteKey(keyId);
   sync_drive_data();
   return result;
 });
