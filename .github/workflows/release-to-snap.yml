@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: npm run ci
       - name: Build project
-        run: npm run dist
+        run: npm run package
       - name: Install Snapcraft
         run: |
           sudo snap install snapcraft --classic
