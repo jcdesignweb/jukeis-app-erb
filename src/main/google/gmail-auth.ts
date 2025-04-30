@@ -12,9 +12,7 @@ let authWindow: BrowserWindow;
 
 const PORT = 51739;
 
-const googleClientId = config.google.googleClientId;
-const googleClientSecret = config.google.googleClientSecret;
-export const redirectUri = config.google.googleRedirectUri;
+const { googleClientId, googleClientSecret, googleRedirectUri } = config.google;
 
 const oathCallbackFile = config.isDev
   ? path.join(rootFolder(), './assets/html/oauth_callback.html')
@@ -65,6 +63,9 @@ export function startGoogleLoginFlow(mainWindow: BrowserWindow) {
     },
   });
 
+  authWindow.on('closed', () => {
+    server.close();
+  });
   authWindow.loadURL(authUrl);
 }
 
@@ -115,7 +116,7 @@ export const handleAuthorizationCode = async (authorizationCode: string) => {
   params.append('code', authorizationCode);
   params.append('client_id', googleClientId);
   params.append('client_secret', googleClientSecret);
-  params.append('redirect_uri', redirectUri);
+  params.append('redirect_uri', googleRedirectUri);
 
   try {
     await fetch(tokenEndpoint, {

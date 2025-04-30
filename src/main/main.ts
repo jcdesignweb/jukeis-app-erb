@@ -28,7 +28,6 @@ import { clearToken, getToken, getUserData } from './session';
 
 import {
   handleAuthorizationCode,
-  redirectUri,
   startGoogleLoginFlow,
 } from './google/gmail-auth';
 import { encrypt } from './security/encryption';
@@ -284,7 +283,7 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (url.startsWith(redirectUri)) {
+    if (url.startsWith(config.google.googleRedirectUri)) {
       event.preventDefault();
       const urlParams = new URLSearchParams(url.split('?')[1]);
       const code = urlParams.get('code');
