@@ -7,8 +7,9 @@ const requiredEnvVars = [
 
 const verifyEnvVars = () => {
   for (const env of requiredEnvVars) {
-    if (process.env[env] === undefined)
-      throw new Error(`${env} environment var is missing`);
+    const value = process.env[env];
+    if (!value || value.trim() === '')
+      throw new Error(`${env} environment var is missing or empty`);
   }
 };
 
