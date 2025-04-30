@@ -28,14 +28,13 @@ import { clearToken, getToken, getUserData } from './session';
 
 import {
   handleAuthorizationCode,
-  redirectUri,
   startGoogleLoginFlow,
-} from './gmail/gmail-auth';
+} from './google/gmail-auth';
 import { encrypt } from './security/encryption';
 import {
   downloadUserFileFromDrive,
   uploadToDrive,
-} from './gmail/drive-storage';
+} from './google/drive-storage';
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -133,7 +132,7 @@ ipcMain.handle('add-new-key', async (event, newKey) => {
 });
 
 ipcMain.handle('delete-key', async (event, keyId) => {
-  const result = await localStorage.delete(keyId);
+  const result = await localStorage.deleteKey(keyId);
   sync_drive_data();
   return result;
 });
@@ -284,7 +283,7 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (url.startsWith(redirectUri)) {
+    if (url.startsWith(config.google.googleRedirectUri)) {
       event.preventDefault();
       const urlParams = new URLSearchParams(url.split('?')[1]);
       const code = urlParams.get('code');
