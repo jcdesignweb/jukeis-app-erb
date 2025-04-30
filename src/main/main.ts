@@ -20,7 +20,7 @@ initConfig();
 
 import path from 'path';
 import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
+import * as electronLogger from 'electron-log';
 
 import MenuBuilder from './menu';
 import { Group, localStorage, StoredData } from './data/storage';
@@ -41,10 +41,20 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
 
+import { log } from './utils/logger';
+
+process.on('uncaughtException', (err) => {
+  log(`Uncaught Exception: ${err.stack || err}`);
+});
+
+process.on('unhandledRejection', (reason) => {
+  log(`Unhandled Rejection: ${reason}`);
+});
+
 class AppUpdater {
   constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
+    electronLogger.transports.file.level = 'info';
+    autoUpdater.logger = electronLogger;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }

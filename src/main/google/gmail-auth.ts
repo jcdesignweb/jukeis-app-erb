@@ -7,12 +7,16 @@ import { localStorage } from '../data/storage';
 
 import { rootFolder } from '../utils';
 import { config } from '../config';
+import { log } from '../utils/logger';
 
 let authWindow: BrowserWindow;
 
 const PORT = 51739;
 
 const { googleClientId, googleClientSecret, googleRedirectUri } = config.google;
+
+log(`Client ID: ${googleClientId}`);
+log(`Redirect URI: ${googleRedirectUri}`);
 
 const oathCallbackFile = config.isDev
   ? path.join(rootFolder(), './assets/html/oauth_callback.html')
