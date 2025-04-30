@@ -20,10 +20,7 @@ jobs:
       - name: Install Snapcraft
         run: |
           sudo snap install snapcraft --classic
-      - name: Set Snapcraft credentials
-        run: |
-          echo "${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}" > snapcraft.login
       - name: Upload Snap to Snap Store
         run: |
-          snapcraft login --with snapcraft.login
+          export SNAPCRAFT_STORE_CREDENTIALS="${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}"
           snapcraft upload release/build/*.snap --release=stable
