@@ -13,6 +13,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 22.12.0
+
+      - name: Set environment variables
+        run: |
+          echo "GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ vars.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "GOOGLE_REDIRECT_URI=${{ vars.GOOGLE_REDIRECT_URI }}" >> .env
+          echo "ENCRYPTION_KEY=${{ vars.ENCRYPTION_KEY }}" >> .env
       - name: Install dependencies
         run: npm run ci
       - name: Build project
