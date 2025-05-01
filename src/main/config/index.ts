@@ -1,9 +1,4 @@
-const requiredEnvVars = [
-  'GOOGLE_CLIENT_ID',
-  'GOOGLE_CLIENT_SECRET',
-  'GOOGLE_REDIRECT_URI',
-  'ENCRYPTION_KEY',
-];
+const requiredEnvVars = ['ENCRYPTION_KEY'];
 
 const verifyEnvVars = () => {
   for (const env of requiredEnvVars) {
@@ -17,11 +12,6 @@ export const getConfig = () => {
   verifyEnvVars();
 
   return {
-    google: {
-      googleClientId: process.env.GOOGLE_CLIENT_ID!,
-      googleClientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      googleRedirectUri: process.env.GOOGLE_REDIRECT_URI!,
-    },
     isDev: process.env.NODE_ENV !== 'production',
     encriptionKey: process.env.ENCRYPTION_KEY!,
   };

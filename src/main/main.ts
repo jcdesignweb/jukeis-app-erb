@@ -9,12 +9,15 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { getEnvFilePath, resolveHtmlPath } from './utils';
 import dotenv from 'dotenv';
 
 import { config, initConfig } from './config';
-dotenv.config({ path: getEnvFilePath(app.isPackaged) });
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: getEnvFilePath(app.isPackaged) });
+}
 
 initConfig();
 
@@ -26,10 +29,7 @@ import MenuBuilder from './menu';
 import { Group, localStorage, StoredData } from './data/storage';
 import { clearToken, getToken, getUserData } from './session';
 
-import {
-  handleAuthorizationCode,
-  startGoogleLoginFlow,
-} from './google/gmail-auth';
+import { startGoogleLoginFlow } from './google/gmail-auth';
 import { encrypt } from './security/encryption';
 import {
   downloadUserFileFromDrive,
@@ -208,10 +208,23 @@ ipcMain.handle('add-group', async (_, newGroup: Group) => {
 ipcMain.handle('get-session', async () => {
   const token = await getToken();
   const userData = await getUserData();
+
+  console.log('userData -----', userData);
   if (token && userData) {
     return { token, userData };
   }
   return null;
+});
+
+ipcMain.on('show-loader', (event, show) => {
+  console.log('Showwwww -----------', show);
+
+  // Lógica para mostrar/ocultar el loader en tu ventana principal
+  if (show) {
+    // Mostrar el loader
+  } else {
+    // Ocultar el loader
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -261,7 +274,7 @@ const createWindow = async () => {
     title: 'Jukeis',
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      additionalArguments: [`--googleClientId=${config.google.googleClientId}`],
+      //additionalArguments: [`--googleClientId=${config.google.googleClientId}`],
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
@@ -282,6 +295,9 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('did-finish-load', async () => {
+    console.log('La ventana principal ha terminado de cargar');
+    mainWindow!.webContents.send('show-loader', true);
+
     const token = await getToken();
 
     if (token) {
@@ -293,6 +309,8 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
+    console.log('SEEEEE ----------------------------');
+    /*
     if (url.startsWith(config.google.googleRedirectUri)) {
       event.preventDefault();
       const urlParams = new URLSearchParams(url.split('?')[1]);
@@ -304,6 +322,7 @@ const createWindow = async () => {
         console.error('We did not receive the code');
       }
     }
+      */
   });
 
   mainWindow.on('closed', () => {
@@ -335,14 +354,23 @@ app.on('window-all-closed', () => {
   }
 });
 
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'electron-app', privileges: { secure: true, standard: true } },
+]);
+
 app
   .whenReady()
   .then(() => {
-    if (!app.isDefaultProtocolClient('secure-key-manager')) {
-      app.setAsDefaultProtocolClient('secure-key-manager');
+    if (process.platform === 'win32') {
+      app.setAsDefaultProtocolClient('electron-app');
+    } else if (process.platform === 'darwin') {
+      app.setAsDefaultProtocolClient('electron-app', process.execPath, [
+        path.resolve(process.argv[1]),
+      ]);
     }
 
     createWindow();
+
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

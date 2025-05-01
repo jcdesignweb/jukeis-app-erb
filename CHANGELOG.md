@@ -8,7 +8,6 @@ All notable changes to this project will be documented in this file. See [standa
 ### Features
 
 * CI deploy when master is updated ([c5f8440](https://github.com/jcdesignweb/jukeis-app-erb/commit/c5f8440dafcd34ad6f1eff997b3841e75fe99a6b))
-* CI deploy when master is updated ([f48e86a](https://github.com/jcdesignweb/jukeis-app-erb/commit/f48e86ad3c4d42ab0e87c5368112c37f6f26fccf))
 
 
 ### Bug Fixes

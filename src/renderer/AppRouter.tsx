@@ -8,31 +8,38 @@ import LayoutPage from './pages/LayoutPage';
 import ProfileScreen from './pages/profile/ProfilePage';
 import HomePage from './pages/home/HomePage';
 import ProfilePage from './pages/profile/ProfilePage';
+import { LoaderProvider } from './components/Loader';
 
 function AppRouter() {
   const { isAuthenticated } = useAuth();
 
   return (
     <HashRouter>
-      <div
-        style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
-      >
-        <Routes>
-          <Route path="/" element={<Navigate to="/splash" />} />
-          <Route path="/splash" element={<SplashScreen />} />
+      <LoaderProvider>
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Routes>
+            <Route path="/" element={<Navigate to="/splash" />} />
+            <Route path="/splash" element={<SplashScreen />} />
 
-          <Route path="/" element={<LayoutPage />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route
-              path="/groups"
-              element={
-                isAuthenticated ? <GroupPage /> : <Navigate to="/splash" />
-              }
-            />
-          </Route>
-        </Routes>
-      </div>
+            <Route path="/" element={<LayoutPage />}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route
+                path="/groups"
+                element={
+                  isAuthenticated ? <GroupPage /> : <Navigate to="/splash" />
+                }
+              />
+            </Route>
+          </Routes>
+        </div>
+      </LoaderProvider>
     </HashRouter>
   );
 }

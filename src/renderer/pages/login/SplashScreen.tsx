@@ -21,6 +21,10 @@ const SplashScreen: React.FC<SplashScreenProps> = () => {
   }
 
   useEffect(() => {
+    window.electron.ipcRenderer.on('show-loader', (event, show) => {});
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
       setShowLogin(true);

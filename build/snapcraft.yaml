@@ -24,11 +24,6 @@ parts:
 apps:
   jukeis:
     command: jukeis
-    environment:
-      GOOGLE_CLIENT_ID: $GOOGLE_CLIENT_ID
-      GOOGLE_CLIENT_SECRET: $GOOGLE_CLIENT_SECRET
-      GOOGLE_REDIRECT_URI: $GOOGLE_REDIRECT_URI
-      ENCRYPTION_KEY: $ENCRYPTION_KEY
     plugs:
       - network
       - x11

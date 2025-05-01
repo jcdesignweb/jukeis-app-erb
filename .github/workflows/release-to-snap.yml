@@ -16,9 +16,6 @@ jobs:
 
       - name: Export environment variables
         run: |
-          echo "GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "GOOGLE_CLIENT_SECRET=${{ vars.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
-          echo "GOOGLE_REDIRECT_URI=${{ vars.GOOGLE_REDIRECT_URI }}" >> $GITHUB_ENV
           echo "ENCRYPTION_KEY=${{ vars.ENCRYPTION_KEY }}" >> $GITHUB_ENV
       - name: Install dependencies
         run: npm run ci
