@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.1.8...v1.2.0) (2025-05-01)
+
+
+### Features
+
+* release script ([12c358e](https://github.com/jcdesignweb/jukeis-app-erb/commit/12c358e1cc8c3bc43d0238790dfab82f55767b2c))
+
 ### [1.1.8](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.1.7...v1.1.8) (2025-05-01)
 
 ### [1.1.7](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.1.4...v1.1.7) (2025-05-01)
