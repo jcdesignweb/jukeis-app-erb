@@ -1,6 +1,6 @@
 {
   "name": "jukeis",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Jukeis app for passwords secure storing",
   "keywords": [],
   "repository": {
@@ -153,6 +153,7 @@
     "rimraf": "^6.0.1",
     "sass": "^1.86.0",
     "sass-loader": "^16.0.5",
+    "standard-version": "^9.5.0",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-jest": "^29.2.6",
@@ -172,6 +173,14 @@
     "appId": "org.ju.Jukeis",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
+    "protocols": [
+      {
+        "name": "Jukeis App",
+        "schemes": [
+          "electron-app"
+        ]
+      }
+    ],
     "files": [
       "dist",
       "node_modules",
