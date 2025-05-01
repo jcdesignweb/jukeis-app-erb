@@ -1,27 +1,21 @@
-// components/Loader.tsx
 import React, { useContext, useState, useEffect, ReactNode } from 'react';
 import { Spin } from 'antd';
 import { SpinProps } from 'antd/es/spin';
+import { LoadingOutlined } from '@ant-design/icons';
 
-// Crea un contexto para manejar el estado del loader
 const LoaderContext = React.createContext<any>(null);
 
 export const useLoader = () => {
   return useContext(LoaderContext);
 };
 
-// Componente que muestra el loader globalmente
-const Loader: React.FC<SpinProps> = ({
-  tip = 'Cargando...',
-  size = 'large',
-}) => {
+const Loader: React.FC<SpinProps> = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const showLoader = () => setVisible(true);
     const hideLoader = () => setVisible(false);
 
-    // Escuchar eventos de mostrar y ocultar el loader
     window.electron.ipcRenderer.on('show-loader', (_, show) => {
       if (show) {
         showLoader();
@@ -31,7 +25,6 @@ const Loader: React.FC<SpinProps> = ({
     });
 
     return () => {
-      // Limpiar el event listener cuando el componente se desmonte
       window.electron.ipcRenderer.removeAllListeners('show-loader');
     };
   }, []);
@@ -40,7 +33,10 @@ const Loader: React.FC<SpinProps> = ({
 
   return (
     <div className="loader-overlay">
-      <Spin tip={tip} size={size} />
+      <Spin
+        indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}
+        fullscreen
+      />
     </div>
   );
 };
@@ -50,7 +46,7 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   return (
     <LoaderContext.Provider value={{}}>
-      <Loader />
+      <Loader className="white-spinner" />
       {children}
     </LoaderContext.Provider>
   );

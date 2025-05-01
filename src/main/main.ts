@@ -209,22 +209,10 @@ ipcMain.handle('get-session', async () => {
   const token = await getToken();
   const userData = await getUserData();
 
-  console.log('userData -----', userData);
   if (token && userData) {
     return { token, userData };
   }
   return null;
-});
-
-ipcMain.on('show-loader', (event, show) => {
-  console.log('Showwwww -----------', show);
-
-  // Lógica para mostrar/ocultar el loader en tu ventana principal
-  if (show) {
-    // Mostrar el loader
-  } else {
-    // Ocultar el loader
-  }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -274,7 +262,6 @@ const createWindow = async () => {
     title: 'Jukeis',
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      //additionalArguments: [`--googleClientId=${config.google.googleClientId}`],
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
@@ -294,10 +281,8 @@ const createWindow = async () => {
     }
   });
 
+  /** Window reloaded */
   mainWindow.webContents.on('did-finish-load', async () => {
-    console.log('La ventana principal ha terminado de cargar');
-    mainWindow!.webContents.send('show-loader', true);
-
     const token = await getToken();
 
     if (token) {
@@ -309,20 +294,9 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    console.log('SEEEEE ----------------------------');
-    /*
-    if (url.startsWith(config.google.googleRedirectUri)) {
-      event.preventDefault();
-      const urlParams = new URLSearchParams(url.split('?')[1]);
-      const code = urlParams.get('code');
-
-      if (code) {
-        handleAuthorizationCode(code);
-      } else {
-        console.error('We did not receive the code');
-      }
-    }
-      */
+    /**
+     * for debugging
+     */
   });
 
   mainWindow.on('closed', () => {
@@ -343,9 +317,8 @@ const createWindow = async () => {
 };
 
 /**
- * Add event listeners...
+ * Event listeners...
  */
-
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
