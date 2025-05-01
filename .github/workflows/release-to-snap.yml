@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: npm run ci
       - name: Build project
-        run: npm run package
+        run: ENCRYPTION_KEY=${{ vars.ENCRYPTION_KEY }} npm run package
       - name: Install Snapcraft
         run: |
           sudo snap install snapcraft --classic
