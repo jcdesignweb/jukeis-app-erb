@@ -1,6 +1,6 @@
 {
   "name": "jukeis",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Jukeis app for passwords secure storing",
   "keywords": [],
   "repository": {
@@ -11,7 +11,7 @@
   "author": {
     "name": "Juan Andrés Carmena",
     "email": "juan14nob@gmail.com",
-    "url": ""
+    "url": "github.com:jcdesignweb"
   },
   "main": "./.erb/dll/main.bundle.dev.js",
   "scripts": {
