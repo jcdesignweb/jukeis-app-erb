@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.2.0...v1.3.0) (2025-05-01)
+
+
+### Features
+
+* 1.2.0 ([d67240e](https://github.com/jcdesignweb/jukeis-app-erb/commit/d67240e7ec1c8d38c71b528da6e045fc8a0d6419))
+
+
+### Bug Fixes
+
+* env var for Encryption ([e2eb0d8](https://github.com/jcdesignweb/jukeis-app-erb/commit/e2eb0d83dd81d2a3a3ddc057278d34b762e8c1a2))
+
 ## [1.2.0](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.1.8...v1.2.0) (2025-05-01)
 
 
