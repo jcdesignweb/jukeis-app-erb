@@ -1,8 +1,8 @@
 name: Build and Upload Snap
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'v*'
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
