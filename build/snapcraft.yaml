@@ -1,0 +1,32 @@
+name: jukeis
+version: 1.0.1
+summary: Your secure keys everywhere!
+description: |
+  Your secure keys manager on the Cloud linked directly with your Google account
+
+confinement: strict
+grade: stable
+base: core22
+
+parts:
+  jukeis:
+    plugin: nodejs
+    source: .
+    build-packages:
+      - libgtk-3-0
+      - libx11-xcb1
+    stage-packages:
+      - libgconf-2-4
+      - libxss1
+      - libnss3
+    node-engine: "22.x"
+
+apps:
+  jukeis:
+    command: jukeis
+    plugs:
+      - network
+      - x11
+      - opengl
+      - pulseaudio
+      - home

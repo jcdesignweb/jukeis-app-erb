@@ -66,6 +66,7 @@ const configuration: webpack.Configuration = {
     }),
 
     new webpack.DefinePlugin({
+      'process.env.ENCRYPTION_KEY': JSON.stringify(process.env.ENCRYPTION_KEY),
       'process.type': '"browser"',
     }),
   ],

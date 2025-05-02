@@ -11,7 +11,8 @@ export type Channels =
   | 'delete-key'
   | 'add-group'
   | 'load-groups'
-  | 'delete-group';
+  | 'delete-group'
+  | 'show-loader';
 
 const googleClientIdArg = process.argv.find((arg) =>
   arg.startsWith('--googleClientId='),
@@ -46,6 +47,10 @@ const electronHandler = {
     },
     invoke(channel: Channels, ...args: unknown[]) {
       return ipcRenderer.invoke(channel, ...args);
+    },
+
+    removeAllListeners: (channel?: string) => {
+      (ipcRenderer as any).removeAllListeners(channel); // Aquí usamos `any` para evitar el error de tipo
     },
   },
 };

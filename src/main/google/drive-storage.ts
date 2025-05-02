@@ -1,21 +1,15 @@
+import { writeFile } from 'fs/promises';
 import { drive } from '@googleapis/drive';
 import { OAuth2Client } from 'google-auth-library';
-import { DATA_FILE_NAME } from '../utils';
+import { DATA_FILE_NAME, getDataFilePath } from '../utils';
 
 export async function downloadUserFileFromDrive(
   accessToken: string,
-): Promise<Buffer | undefined> {
+): Promise<void> {
   const authClient = new OAuth2Client();
   authClient.setCredentials({ access_token: accessToken });
 
   const driveV3 = drive({ version: 'v3', auth: authClient });
-
-  /*const listResponse = await driveV3.files.list({
-    q: `name='${DATA_FILE_NAME}' and appProperties has { key='appSpecific' and value='true' } and trashed=false`,
-    fields: 'files(id)',
-    access_token: accessToken,
-  });
-  */
 
   const listResponse = await driveV3.files.list({
     spaces: 'appDataFolder',
@@ -34,7 +28,8 @@ export async function downloadUserFileFromDrive(
         { responseType: 'arraybuffer' },
       );
 
-      return Buffer.from(res.data as ArrayBuffer);
+      const buffer = Buffer.from(res.data as ArrayBuffer);
+      await writeFile(getDataFilePath(), buffer);
     } catch (error) {
       console.error('Error downloading file from Drive:', error);
       throw error;

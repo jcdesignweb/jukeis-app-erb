@@ -87,13 +87,6 @@ Follow these steps to install and run Jukeis on your system.
 
 To run this project, you will need to add the following environment variables to your .env file else the project will fail
 
-
-`GOOGLE_CLIENT_ID` your google client id (you must create an application at https://console.cloud.google.com/)
-
-`GOOGLE_CLIENT_SECRET` your google client secret app
-
-`GOOGLE_REDIRECT_URI` redirect callback for Oauth2
-
 `ENCRYPTION_KEY` encription hash master key Example: 'fBcDeFgHiJKLmNooqZsTuVwXyZ019124'
 
 

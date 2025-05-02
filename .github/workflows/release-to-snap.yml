@@ -1,8 +1,8 @@
 name: Build and Upload Snap
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'v*'
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -12,19 +12,19 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22.12.0
+
+      - name: Export environment variables
+        run: |
+          echo "ENCRYPTION_KEY=${{ vars.ENCRYPTION_KEY }}" >> $GITHUB_ENV
       - name: Install dependencies
-        run: npm ci
+        run: npm run ci
       - name: Build project
-        run: npm run dist
+        run: ENCRYPTION_KEY=${{ vars.ENCRYPTION_KEY }} npm run package
       - name: Install Snapcraft
         run: |
           sudo snap install snapcraft --classic
-      - name: Save Snapcraft credentials
-        run: |
-          echo "${{ secrets.SNAPCRAFT_LOGIN }}" > snapcraft.login
-        shell: bash
       - name: Upload Snap to Snap Store
         run: |
-          snapcraft login --with snapcraft.login
+          export SNAPCRAFT_STORE_CREDENTIALS="${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}"
           snapcraft upload release/build/*.snap --release=stable

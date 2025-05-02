@@ -9,27 +9,27 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { getEnvFilePath, resolveHtmlPath } from './utils';
 import dotenv from 'dotenv';
 
 import { config, initConfig } from './config';
-dotenv.config({ path: getEnvFilePath(app.isPackaged) });
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: getEnvFilePath(app.isPackaged) });
+}
 
 initConfig();
 
 import path from 'path';
 import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
+import * as electronLogger from 'electron-log';
 
 import MenuBuilder from './menu';
 import { Group, localStorage, StoredData } from './data/storage';
 import { clearToken, getToken, getUserData } from './session';
 
-import {
-  handleAuthorizationCode,
-  startGoogleLoginFlow,
-} from './google/gmail-auth';
+import { startGoogleLoginFlow } from './google/gmail-auth';
 import { encrypt } from './security/encryption';
 import {
   downloadUserFileFromDrive,
@@ -41,10 +41,20 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
 
+import { log } from './utils/logger';
+
+process.on('uncaughtException', (err) => {
+  log(`Uncaught Exception: ${err.stack || err}`);
+});
+
+process.on('unhandledRejection', (reason) => {
+  log(`Unhandled Rejection: ${reason}`);
+});
+
 class AppUpdater {
   constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
+    electronLogger.transports.file.level = 'info';
+    autoUpdater.logger = electronLogger;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
@@ -76,7 +86,7 @@ i18n
   });
 
 /**
- * this method will downdload the file from google drive if doesn't exists.
+ * this method will downdload the file from google drive if doesn't exists locally.
  */
 async function download_drive_data() {
   const token = await getToken();
@@ -160,7 +170,7 @@ ipcMain.on('start-google-login', () => {
     throw new Error('windows is not defined');
   }
 
-  startGoogleLoginFlow(mainWindow);
+  startGoogleLoginFlow(mainWindow, download_drive_data);
 });
 
 ipcMain.handle('delete-group', async (_, id: string) => {
@@ -198,6 +208,7 @@ ipcMain.handle('add-group', async (_, newGroup: Group) => {
 ipcMain.handle('get-session', async () => {
   const token = await getToken();
   const userData = await getUserData();
+
   if (token && userData) {
     return { token, userData };
   }
@@ -251,7 +262,6 @@ const createWindow = async () => {
     title: 'Jukeis',
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      additionalArguments: [`--googleClientId=${config.google.googleClientId}`],
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
@@ -271,6 +281,7 @@ const createWindow = async () => {
     }
   });
 
+  /** Window reloaded */
   mainWindow.webContents.on('did-finish-load', async () => {
     const token = await getToken();
 
@@ -283,17 +294,9 @@ const createWindow = async () => {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (url.startsWith(config.google.googleRedirectUri)) {
-      event.preventDefault();
-      const urlParams = new URLSearchParams(url.split('?')[1]);
-      const code = urlParams.get('code');
-
-      if (code) {
-        handleAuthorizationCode(code);
-      } else {
-        console.error('We did not receive the code');
-      }
-    }
+    /**
+     * for debugging
+     */
   });
 
   mainWindow.on('closed', () => {
@@ -314,9 +317,8 @@ const createWindow = async () => {
 };
 
 /**
- * Add event listeners...
+ * Event listeners...
  */
-
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -325,14 +327,23 @@ app.on('window-all-closed', () => {
   }
 });
 
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'electron-app', privileges: { secure: true, standard: true } },
+]);
+
 app
   .whenReady()
   .then(() => {
-    if (!app.isDefaultProtocolClient('secure-key-manager')) {
-      app.setAsDefaultProtocolClient('secure-key-manager');
+    if (process.platform === 'win32') {
+      app.setAsDefaultProtocolClient('electron-app');
+    } else if (process.platform === 'darwin') {
+      app.setAsDefaultProtocolClient('electron-app', process.execPath, [
+        path.resolve(process.argv[1]),
+      ]);
     }
 
     createWindow();
+
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
