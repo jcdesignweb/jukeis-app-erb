@@ -1,4 +1,6 @@
-import { decrypt, encrypt } from '../security/encryption';
+import { EncripterCryptoSingleton } from '../security/encrypter.singleton';
+
+const encrypter = EncripterCryptoSingleton.getInstance();
 
 const getStore = async () => {
   const mod = await import('electron-store');
@@ -9,21 +11,21 @@ const getStore = async () => {
 };
 
 export async function saveToken(token: string) {
-  (await getStore()).set('auth.token', encrypt(token));
+  (await getStore()).set('auth.token', encrypter.encrypt(token));
 }
 
 export async function saveUserData(user: string) {
-  (await getStore()).set('auth.user', encrypt(user));
+  (await getStore()).set('auth.user', encrypter.encrypt(user));
 }
 
 export async function getUserData(): Promise<string | null> {
   const encrypted = (await getStore()).get('auth.user') as string;
-  return encrypted ? JSON.parse(decrypt(encrypted)) : null;
+  return encrypted ? JSON.parse(encrypter.decrypt(encrypted)) : null;
 }
 
 export async function getToken(): Promise<string | null> {
   const encrypted = (await getStore()).get('auth.token') as string;
-  return encrypted ? decrypt(encrypted) : null;
+  return encrypted ? encrypter.decrypt(encrypted) : null;
 }
 
 export async function clearToken() {

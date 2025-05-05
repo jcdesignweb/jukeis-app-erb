@@ -1,7 +1,10 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { encrypt, decrypt } from '../security/encryption';
+
 import { getDataFilePath } from '../utils';
+
+import { EncripterCryptoSingleton } from '../security/encrypter.singleton';
+import { CryptoAdapter } from '../security/CryptoAdapter';
 
 const dataFilePath = path.resolve(getDataFilePath());
 
@@ -19,10 +22,12 @@ export interface StoredData {
 }
 
 export class LocalStorage {
+  private encrypter: CryptoAdapter = EncripterCryptoSingleton.getInstance();
+
   async load(): Promise<StoredData | null> {
     try {
       const encryptedData = await fs.readFile(dataFilePath, 'utf-8');
-      const decrypted = decrypt(encryptedData);
+      const decrypted = this.encrypter.decrypt(encryptedData);
       return JSON.parse(decrypted);
     } catch (error) {
       console.error(`[LocalStorage] Failed to load data:`, error);
@@ -33,7 +38,7 @@ export class LocalStorage {
   async save(data: StoredData): Promise<void> {
     try {
       const json = JSON.stringify(data, null, 2);
-      const encrypted = encrypt(json);
+      const encrypted = this.encrypter.encrypt(json);
       await fs.writeFile(dataFilePath, encrypted, 'utf-8');
     } catch (error) {
       console.error(`[LocalStorage] Failed to save data:`, error);

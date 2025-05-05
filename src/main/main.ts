@@ -30,7 +30,6 @@ import { Group, localStorage, StoredData } from './data/storage';
 import { clearToken, getToken, getUserData } from './session';
 
 import { startGoogleLoginFlow } from './google/gmail-auth';
-import { encrypt } from './security/encryption';
 import {
   downloadUserFileFromDrive,
   uploadToDrive,
@@ -42,6 +41,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
 
 import { log } from './utils/logger';
+
+import { EncripterCryptoSingleton } from './security/encrypter.singleton';
 
 process.on('uncaughtException', (err) => {
   log(`Uncaught Exception: ${err.stack || err}`);
@@ -109,7 +110,8 @@ async function sync_drive_data() {
     }
 
     const loadedData = await localStorage.load();
-    const data = encrypt(JSON.stringify(loadedData));
+    const encrypter = EncripterCryptoSingleton.getInstance();
+    const data = encrypter.encrypt(JSON.stringify(loadedData));
     //const data = JSON.stringify(loadedData);
     await uploadToDrive(token, data);
 
