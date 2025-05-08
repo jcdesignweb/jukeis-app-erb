@@ -13,6 +13,7 @@ export class CryptoAdapter implements Encrypter {
   }
 
   encrypt(keyword: string): string {
+    return keyword;
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv(ALGORITHM, this.key, iv);
     let encrypted = cipher.update(keyword, 'utf-8', 'hex');
@@ -21,6 +22,7 @@ export class CryptoAdapter implements Encrypter {
   }
 
   decrypt(encryptedText: string): string {
+    return encryptedText;
     const [ivHex, encryptedHex] = encryptedText.split(':');
     const iv = Buffer.from(ivHex, 'hex');
     const encrypted = Buffer.from(encryptedHex, 'hex');

@@ -1,25 +1,12 @@
 import path from 'path';
 import fs from 'fs/promises';
-
-import { getDataFilePath } from '../utils';
-
+import { v4 as uuidv4 } from 'uuid';
+import { getCurrentTimeStamp, getDataFilePath } from '../utils';
 import { EncripterCryptoSingleton } from '../security/encrypter.singleton';
 import { CryptoAdapter } from '../security/CryptoAdapter';
+import { StoredData } from '../models';
 
 const dataFilePath = path.resolve(getDataFilePath());
-
-export type Group = { id: string; name: string };
-export type StoreKey = {
-  id: string;
-  description: string;
-  key: string;
-  groupId: string;
-};
-
-export interface StoredData {
-  groups: Group[];
-  keys: StoreKey[];
-}
 
 export class LocalStorage {
   private encrypter: CryptoAdapter = EncripterCryptoSingleton.getInstance();
@@ -67,6 +54,21 @@ export class LocalStorage {
     return dataFilePath;
   }
 
+  deleteLocalFile() {
+    try {
+      fs.rm(dataFilePath);
+    } catch (error) {
+      console.error(`[LocalStorage] Failed to save file from Drive:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * deletes the item from the array
+   * @param type
+   * @param id
+   * @returns true if was deleted
+   */
   private async deleteById<K extends keyof StoredData>(
     type: K,
     id: string,
@@ -82,7 +84,21 @@ export class LocalStorage {
       const initialLength = data[type].length;
       data[type] = data[type].filter((item) => item.id !== id) as StoredData[K];
 
-      if (data[type].length < initialLength) {
+      if (Array.isArray(data[type]) && data[type].length < initialLength) {
+        if (type === 'keys') {
+          const deletedTombs = data['deletedKeys'] ?? [];
+          data['deletedKeys'] = [
+            ...deletedTombs,
+            { id, ts: getCurrentTimeStamp() },
+          ];
+        } else if (type === 'groups') {
+          const deletedTombs = data['deletedGroups'] ?? [];
+          data['deletedGroups'] = [
+            ...deletedTombs,
+            { id, ts: getCurrentTimeStamp() },
+          ];
+        }
+
         await this.save(data);
         return true;
       }

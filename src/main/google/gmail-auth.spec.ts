@@ -43,7 +43,7 @@ describe('startGoogleLoginFlow', () => {
   });
 
   it('should sends show-loader to the mainWindow', () => {
-    startGoogleLoginFlow(mockMainWindow, () => {});
+    startGoogleLoginFlow(mockMainWindow);
     expect(mockMainWindow.webContents.send).toHaveBeenCalledWith(
       'show-loader',
       true,

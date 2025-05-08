@@ -2,7 +2,7 @@ import { Form, Input, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { t } from 'i18next';
 import { v4 as uuidv4 } from 'uuid';
-import { Group } from '../../../../../main/data/storage';
+import { Group } from '../../../../../main/models';
 
 export type AddGroupModalProps = {
   isModalOpen: boolean;
@@ -28,6 +28,7 @@ export const AddGroupModal: React.FC<AddGroupModalProps> = ({
     const newGroup: Group = {
       id: uuidv4(),
       name: values.group,
+      ts: Date.now().toString(),
     };
 
     try {

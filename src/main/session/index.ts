@@ -14,18 +14,32 @@ export async function saveToken(token: string) {
   (await getStore()).set('auth.token', encrypter.encrypt(token));
 }
 
+export async function saveRefreshToken(token: string) {
+  (await getStore()).set('auth.refresh_token', encrypter.encrypt(token));
+}
+
+export async function getRefreshToken() {
+  const refreshTokenCoded = (await getStore()).get(
+    'auth.refresh_token',
+  ) as string;
+  return refreshTokenCoded ? encrypter.decrypt(refreshTokenCoded) : null;
+}
+
 export async function saveUserData(user: string) {
   (await getStore()).set('auth.user', encrypter.encrypt(user));
 }
 
 export async function getUserData(): Promise<string | null> {
   const encrypted = (await getStore()).get('auth.user') as string;
-  return encrypted ? JSON.parse(encrypter.decrypt(encrypted)) : null;
+  return encrypted ? encrypter.decrypt(encrypted) : null;
 }
 
-export async function getToken(): Promise<string | null> {
+export async function getToken(): Promise<string> {
   const encrypted = (await getStore()).get('auth.token') as string;
-  return encrypted ? encrypter.decrypt(encrypted) : null;
+
+  if (!encrypted) throw new Error('token is missing');
+
+  return encrypter.decrypt(encrypted);
 }
 
 export async function clearToken() {

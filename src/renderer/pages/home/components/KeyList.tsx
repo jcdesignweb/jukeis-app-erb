@@ -7,7 +7,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { t } from 'i18next';
-import { StoreKey, Group, StoredData } from '../../../../main/data/storage';
+import { StoreKey, Group, StoredData } from '../../../../main/models';
 import { deleteItemModal } from '../../../utils/modal-delete-item';
 import { useDataContext } from '../../../contexts/DataContext';
 

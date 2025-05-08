@@ -13,7 +13,7 @@ import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { getEnvFilePath, resolveHtmlPath } from './utils';
 import dotenv from 'dotenv';
 
-import { config, initConfig } from './config';
+import { initConfig } from './config';
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config({ path: getEnvFilePath(app.isPackaged) });
@@ -22,18 +22,13 @@ if (process.env.NODE_ENV !== 'production') {
 initConfig();
 
 import path from 'path';
-import { autoUpdater } from 'electron-updater';
-import * as electronLogger from 'electron-log';
-
 import MenuBuilder from './menu';
-import { Group, localStorage, StoredData } from './data/storage';
+import { localStorage } from './data/local-storage';
+import { dataInitializor, Group, StoredData } from './models';
 import { clearToken, getToken, getUserData } from './session';
 
-import { startGoogleLoginFlow } from './google/gmail-auth';
-import {
-  downloadUserFileFromDrive,
-  uploadToDrive,
-} from './google/drive-storage';
+import { startGoogleLoginFlow, UserInfo } from './google/gmail-auth';
+import GoogleDriveStorage from './google/drive-storage';
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -42,7 +37,10 @@ import HttpApi from 'i18next-http-backend';
 
 import { log } from './utils/logger';
 
-import { EncripterCryptoSingleton } from './security/encrypter.singleton';
+import es from '../../public/locales/es/translation.json';
+import en from '../../public/locales/en/translation.json';
+
+import { sync_drive_data } from './data/sync';
 
 process.on('uncaughtException', (err) => {
   log(`Uncaught Exception: ${err.stack || err}`);
@@ -52,19 +50,8 @@ process.on('unhandledRejection', (reason) => {
   log(`Unhandled Rejection: ${reason}`);
 });
 
-class AppUpdater {
-  constructor() {
-    electronLogger.transports.file.level = 'info';
-    autoUpdater.logger = electronLogger;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
-
 let mainWindow: BrowserWindow | null = null;
-let storedData: StoredData = { groups: [], keys: [] };
-
-import es from '../../public/locales/es/translation.json';
-import en from '../../public/locales/en/translation.json';
+let storedData: StoredData = dataInitializor;
 
 i18n
   .use(HttpApi)
@@ -86,41 +73,26 @@ i18n
     },
   });
 
-/**
- * this method will downdload the file from google drive if doesn't exists locally.
- */
-async function download_drive_data() {
-  const token = await getToken();
+const sync = async () => {
+  if (!mainWindow) return;
+  mainWindow.webContents.send('cloud-synchronizing', true);
+  await sync_drive_data();
 
-  if (!token) {
-    throw new Error('user is not login.');
-  }
+  mainWindow.webContents.send('cloud-synchronizing', false);
+};
 
-  downloadUserFileFromDrive(token);
-}
+ipcMain.handle('cloud-sync', async () => {
+  console.log('Cloud sync started.');
 
-/**
- * sync keys into Google drive, this will we executed after add or remove some data
- */
-async function sync_drive_data() {
-  try {
-    const token = await getToken();
-    if (!token) {
-      throw new Error('user is not log in.');
-    }
+  await sync();
+});
 
-    const loadedData = await localStorage.load();
-    const encrypter = EncripterCryptoSingleton.getInstance();
-    const data = encrypter.encrypt(JSON.stringify(loadedData));
-    //const data = JSON.stringify(loadedData);
-    await uploadToDrive(token, data);
+ipcMain.handle('erase-data', async () => {
+  const googleDrive = new GoogleDriveStorage();
+  await googleDrive.removeFile();
 
-    return true;
-  } catch (error) {
-    console.error('Error storing in Drive', error);
-    return false;
-  }
-}
+  localStorage.deleteLocalFile();
+});
 
 ipcMain.handle('add-new-key', async (event, newKey) => {
   const storedData: StoredData = (await localStorage.load()) || {
@@ -137,7 +109,7 @@ ipcMain.handle('add-new-key', async (event, newKey) => {
 
   try {
     await localStorage.save(updatedStoredData);
-    sync_drive_data();
+    await sync();
   } catch (error) {
     console.error('Error stoing a new key:', error);
   }
@@ -145,7 +117,7 @@ ipcMain.handle('add-new-key', async (event, newKey) => {
 
 ipcMain.handle('delete-key', async (event, keyId) => {
   const result = await localStorage.deleteKey(keyId);
-  sync_drive_data();
+  await sync();
   return result;
 });
 
@@ -167,17 +139,24 @@ ipcMain.handle('log-out', async () => {
   await clearToken();
 });
 
-ipcMain.on('start-google-login', () => {
+ipcMain.on('start-google-login', async () => {
   if (!mainWindow) {
     throw new Error('windows is not defined');
   }
 
-  startGoogleLoginFlow(mainWindow, download_drive_data);
+  console.log('start-google-login');
+
+  const userInfo = await startGoogleLoginFlow(mainWindow);
+
+  await sync();
+  mainWindow.webContents.send('login-success', {
+    userData: userInfo,
+  });
 });
 
 ipcMain.handle('delete-group', async (_, id: string) => {
   const result = await localStorage.deleteGroup(id);
-  sync_drive_data();
+  await sync();
   return result;
 });
 
@@ -200,7 +179,7 @@ ipcMain.handle('add-group', async (_, newGroup: Group) => {
   try {
     await localStorage.save(updatedStoredData);
 
-    sync_drive_data();
+    await sync();
     return updatedGroups;
   } catch (error) {
     console.error('Storing Group Error', error);
@@ -209,11 +188,16 @@ ipcMain.handle('add-group', async (_, newGroup: Group) => {
 
 ipcMain.handle('get-session', async () => {
   const token = await getToken();
-  const userData = await getUserData();
+  const userDataStr = await getUserData();
 
-  if (token && userData) {
-    return { token, userData };
+  if (userDataStr) {
+    const userData: UserInfo = JSON.parse(userDataStr);
+
+    if (token && userData) {
+      return { token, userData };
+    }
   }
+
   return null;
 });
 
@@ -312,10 +296,6 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**

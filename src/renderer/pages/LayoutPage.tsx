@@ -1,13 +1,29 @@
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Button, Layout } from 'antd';
+import {
+  LoadingOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from '@ant-design/icons';
+import { Button, Layout, Spin, Tooltip } from 'antd';
 import { Content, Footer, Header } from 'antd/es/layout/layout';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/SideBar';
 import logo from '../../../assets/logo.png';
+import { t } from 'i18next';
 
 function LayoutPage() {
   const [expanded, setExpanded] = useState(false);
+
+  const [isSynchronizing, setIsSynchronizing] = useState(false);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on(
+      'cloud-synchronizing',
+      (_event, isLoading: unknown) => {
+        setIsSynchronizing(isLoading as boolean);
+      },
+    );
+  }, []);
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
@@ -40,6 +56,16 @@ function LayoutPage() {
           />
 
           <img src={logo} alt="Jukeis Logo" className="logo-header" />
+
+          <div style={{ float: 'right' }}>
+            {isSynchronizing && (
+              <Tooltip placement="left" title={t('synchronizing')}>
+                <Spin
+                  indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
+                />
+              </Tooltip>
+            )}
+          </div>
         </Header>
         <Content
           style={{

@@ -12,7 +12,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { t } from 'i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { PlusOutlined } from '@ant-design/icons';
-import { Group } from '../../../../../main/data/storage';
+import { Group } from '../../../../../main/models';
 import { useDataContext } from '../../../../contexts/DataContext';
 
 export type AddKeyModalProps = {
@@ -47,6 +47,7 @@ export const AddKeyModal: React.FC<AddKeyModalProps> = ({
         key: values.password,
         id: uuidv4(),
         groupId: values.groupId,
+        ts: Date.now().toString(),
       });
 
       onComplete(true);
@@ -73,6 +74,7 @@ export const AddKeyModal: React.FC<AddKeyModalProps> = ({
     const newGroup: Group = {
       id: uuidv4(),
       name: groupName,
+      ts: Date.now().toString(),
     };
 
     try {

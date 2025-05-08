@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
-import React, { useEffect, useState } from 'react';
-import { Group, StoredData, StoreKey } from '../../../main/data/storage';
+import React, { useState } from 'react';
+
 import { AddKeyModal } from './components/modal/addKey.modal';
 import KeyList from './components/KeyList';
 
@@ -24,6 +24,10 @@ const HomePage: React.FC<HomeScreenProps> = () => {
     setIsModalOpen(true);
   };
 
+  const sync = () => {
+    window.electron.ipcRenderer.sendMessage('cloud-sync');
+  };
+
   return (
     <div>
       <Button
@@ -41,6 +45,8 @@ const HomePage: React.FC<HomeScreenProps> = () => {
       />
       <h2 style={{ marginTop: 24 }}>{useTranslation().t('home.title')}</h2>
       <KeyList />
+
+      <button onClick={sync}>Sync</button>
     </div>
   );
 };

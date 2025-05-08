@@ -1,8 +1,12 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer } from 'electron';
+import { StoreKey } from './models';
 
 export type Channels =
+  | 'erase-data'
+  | 'cloud-sync'
+  | 'cloud-synchronizing'
   | 'add-new-key'
   | 'load-keys'
   | 'login-success'
@@ -21,7 +25,7 @@ const googleClientId = googleClientIdArg ? googleClientIdArg.split('=')[1] : '';
 
 const electronHandler = {
   googleClientId,
-  openExternal: (url: string) => {
+  initLogin: () => {
     ipcRenderer.send('start-google-login');
   },
 
@@ -39,7 +43,8 @@ const electronHandler = {
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
-    async sendNewKey(newKey: { description: string; key: string }) {
+
+    async sendNewKey(newKey: Partial<StoreKey>) {
       return ipcRenderer.invoke('add-new-key', newKey);
     },
     sendDeleteKey(key: string) {
