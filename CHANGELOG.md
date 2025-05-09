@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.4.0 (2025-05-09)
+
+
+### Features
+
+* CI deploy when master is updated ([c5f8440](https://github.com/jcdesignweb/jukeis-app-erb/commit/c5f8440dafcd34ad6f1eff997b3841e75fe99a6b))
+* CI deploy when master is updated ([f48e86a](https://github.com/jcdesignweb/jukeis-app-erb/commit/f48e86ad3c4d42ab0e87c5368112c37f6f26fccf))
+* improving security module using design patterns ([50b7f92](https://github.com/jcdesignweb/jukeis-app-erb/commit/50b7f92cdb7c15f279f5781836e40490e6385ba8))
+* sync process triggered from a listener, minor ui fixes ([e71fe21](https://github.com/jcdesignweb/jukeis-app-erb/commit/e71fe21e46a85c012beb214c51773da69685f99d))
+* synchronizying data between two clients, refresh token,  minor fixes. ([bdf6cd0](https://github.com/jcdesignweb/jukeis-app-erb/commit/bdf6cd0ae28031851bc7ecf5412b55f4f42729bb))
+* unique reset ([c446960](https://github.com/jcdesignweb/jukeis-app-erb/commit/c4469607882f7ebd05e8686979679059ef62abf4))
+
+
+### Bug Fixes
+
+* code cleaning ([6385578](https://github.com/jcdesignweb/jukeis-app-erb/commit/63855784fc5ccb6871247b17ae4c8f3dcd501beb))
+* solving Login windows closed ([81f77de](https://github.com/jcdesignweb/jukeis-app-erb/commit/81f77de7368158e318d36c8e091f872ef270455b))
+
 ### [1.3.1](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.3.0...v1.3.1) (2025-05-01)
 
 ## [1.3.0](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.2.0...v1.3.0) (2025-05-01)
