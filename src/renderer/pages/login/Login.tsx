@@ -6,35 +6,20 @@ import { useAuth } from '../../contexts/AuthContext';
 
 import logo from '../../../../assets/logo.png';
 
-const redirectUri = 'http://localhost:51739';
-const scope =
-  'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
-const authorizationEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
-const responseType = 'code';
-const accessType = 'offline';
-
-interface LoginProps {}
-
-const Login: React.FC<LoginProps> = () => {
+const Login: React.FC<{}> = () => {
   const { login } = useAuth();
 
   const navigate = useNavigate();
 
-  const googleClientId = (window as any).electron?.googleClientId;
-
   useEffect(() => {
-    window.electron.ipcRenderer.on('login-success', (_event, data: any) => {
-      if (data) {
-        login();
-        navigate('/home');
-      }
+    window.electron.ipcRenderer.on('login-success', (_event) => {
+      login();
+      navigate('/home');
     });
   }, []);
 
   const handleGoogleLogin = () => {
-    const authorizationUrl = `${authorizationEndpoint}?client_id=${googleClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=${responseType}&access_type=${accessType}`;
-
-    window.electron.openExternal(authorizationUrl);
+    window.electron.initLogin();
   };
 
   return (

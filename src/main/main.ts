@@ -10,39 +10,26 @@
  */
 
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
-import { getEnvFilePath, resolveHtmlPath } from './utils';
-import dotenv from 'dotenv';
-
-import { config, initConfig } from './config';
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: getEnvFilePath(app.isPackaged) });
-}
-
-initConfig();
-
+import { resolveHtmlPath } from './utils';
+import { config } from './config';
 import path from 'path';
-import { autoUpdater } from 'electron-updater';
-import * as electronLogger from 'electron-log';
-
 import MenuBuilder from './menu';
-import { Group, localStorage, StoredData } from './data/storage';
-import { clearToken, getToken, getUserData } from './session';
-
-import { startGoogleLoginFlow } from './google/gmail-auth';
-import {
-  downloadUserFileFromDrive,
-  uploadToDrive,
-} from './google/drive-storage';
-
+import { getToken, getUserData } from './session';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
-
 import { log } from './utils/logger';
-
-import { EncripterCryptoSingleton } from './security/encrypter.singleton';
+import es from '../../public/locales/es/translation.json';
+import en from '../../public/locales/en/translation.json';
+import { sync_drive_data } from './data/sync';
+import { eventBus } from './ipc/event-bus';
+import { IPC_CHANNELS } from './ipc/channels';
+import { registerKeyHandlers } from './ipc/keys.listener';
+import { registerSessionHandlers } from './ipc/sessions.listener';
+import { registerGroupHandlers } from './ipc/group.listener';
+import { registerAppHandlers } from './ipc/app.listener';
+import { registerSyncHandlers } from './ipc/sync.listener';
 
 process.on('uncaughtException', (err) => {
   log(`Uncaught Exception: ${err.stack || err}`);
@@ -52,19 +39,7 @@ process.on('unhandledRejection', (reason) => {
   log(`Unhandled Rejection: ${reason}`);
 });
 
-class AppUpdater {
-  constructor() {
-    electronLogger.transports.file.level = 'info';
-    autoUpdater.logger = electronLogger;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
-
 let mainWindow: BrowserWindow | null = null;
-let storedData: StoredData = { groups: [], keys: [] };
-
-import es from '../../public/locales/es/translation.json';
-import en from '../../public/locales/en/translation.json';
 
 i18n
   .use(HttpApi)
@@ -86,135 +61,14 @@ i18n
     },
   });
 
-/**
- * this method will downdload the file from google drive if doesn't exists locally.
- */
-async function download_drive_data() {
-  const token = await getToken();
-
-  if (!token) {
-    throw new Error('user is not login.');
-  }
-
-  downloadUserFileFromDrive(token);
-}
-
-/**
- * sync keys into Google drive, this will we executed after add or remove some data
- */
-async function sync_drive_data() {
-  try {
-    const token = await getToken();
-    if (!token) {
-      throw new Error('user is not log in.');
-    }
-
-    const loadedData = await localStorage.load();
-    const encrypter = EncripterCryptoSingleton.getInstance();
-    const data = encrypter.encrypt(JSON.stringify(loadedData));
-    //const data = JSON.stringify(loadedData);
-    await uploadToDrive(token, data);
-
-    return true;
-  } catch (error) {
-    console.error('Error storing in Drive', error);
-    return false;
+function sendToRenderer(channel: string, value: any) {
+  if (mainWindow?.webContents) {
+    mainWindow.webContents.send(channel, value);
   }
 }
-
-ipcMain.handle('add-new-key', async (event, newKey) => {
-  const storedData: StoredData = (await localStorage.load()) || {
-    groups: [],
-    keys: [],
-  };
-
-  const updatedKeys = [...(storedData.keys ?? []), newKey];
-
-  const updatedStoredData: StoredData = {
-    ...storedData,
-    keys: updatedKeys,
-  };
-
-  try {
-    await localStorage.save(updatedStoredData);
-    sync_drive_data();
-  } catch (error) {
-    console.error('Error stoing a new key:', error);
-  }
-});
-
-ipcMain.handle('delete-key', async (event, keyId) => {
-  const result = await localStorage.deleteKey(keyId);
-  sync_drive_data();
-  return result;
-});
-
-const getData = async () => {
-  const loadedData = await localStorage.load();
-  storedData = loadedData || { groups: [], keys: [] };
-  return storedData;
-};
-
-ipcMain.handle('load-keys', async () => {
-  return await getData();
-});
 
 ipcMain.on('open-external', (_, url: string) => {
   shell.openExternal(url);
-});
-
-ipcMain.handle('log-out', async () => {
-  await clearToken();
-});
-
-ipcMain.on('start-google-login', () => {
-  if (!mainWindow) {
-    throw new Error('windows is not defined');
-  }
-
-  startGoogleLoginFlow(mainWindow, download_drive_data);
-});
-
-ipcMain.handle('delete-group', async (_, id: string) => {
-  const result = await localStorage.deleteGroup(id);
-  sync_drive_data();
-  return result;
-});
-
-ipcMain.handle('add-group', async (_, newGroup: Group) => {
-  const { groups } = await getData();
-
-  if (groups !== undefined) {
-    const existsGroup = groups.find((g) => g.name === newGroup.name);
-    if (existsGroup) {
-      throw new Error('Group Alredy exists');
-    }
-  }
-
-  const updatedGroups = [...(storedData.groups ?? []), newGroup];
-  const updatedStoredData: StoredData = {
-    ...storedData,
-    groups: updatedGroups,
-  };
-
-  try {
-    await localStorage.save(updatedStoredData);
-
-    sync_drive_data();
-    return updatedGroups;
-  } catch (error) {
-    console.error('Storing Group Error', error);
-  }
-});
-
-ipcMain.handle('get-session', async () => {
-  const token = await getToken();
-  const userData = await getUserData();
-
-  if (token && userData) {
-    return { token, userData };
-  }
-  return null;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -247,7 +101,7 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  app.setName('Jukeis');
+  app.setName(config.appTitle);
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -261,7 +115,7 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
-    title: 'Jukeis',
+    title: config.appTitle,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -270,7 +124,13 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.setTitle('Jukeis');
+  registerKeyHandlers();
+  registerGroupHandlers();
+  registerSessionHandlers(mainWindow);
+  registerAppHandlers();
+  registerSyncHandlers(sendToRenderer);
+
+  mainWindow.setTitle(config.appTitle);
   mainWindow.loadURL(resolveHtmlPath('index.html'));
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -312,10 +172,6 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 };
 
 /**

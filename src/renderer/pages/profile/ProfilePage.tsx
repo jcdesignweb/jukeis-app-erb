@@ -6,6 +6,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import logoutModal from '../../utils/modal-logout';
 
 import './ProfilePage.css';
+import { UserInfo } from '../../../main/google/gmail-auth';
+import { SyncOutlined } from '@ant-design/icons';
 
 const ProfilePage: React.FC = () => {
   const [user, setUser] = useState<{ name: string; picture: string } | null>(
@@ -20,12 +22,16 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      const session: { userData: any } =
+      const session: { token: string; userData: UserInfo } =
         await window.electron.ipcRenderer.invoke('get-session');
 
+      if (!session.userData) {
+        throw new Error('user must log in');
+      }
+
       setUser({
-        name: session.userData?.name || 'Usuario',
-        picture: session.userData?.picture || '', // URL de Google
+        name: session.userData.name,
+        picture: session.userData.picture, // URL de Google
       });
     };
 
@@ -37,6 +43,14 @@ const ProfilePage: React.FC = () => {
       logout();
       navigate('/');
     });
+  };
+
+  const sync = () => {
+    window.electron.ipcRenderer.sendMessage('cloud-sync');
+  };
+
+  const onEraseClick = () => {
+    window.electron.ipcRenderer.sendMessage('erase-data');
   };
 
   return (
@@ -54,6 +68,7 @@ const ProfilePage: React.FC = () => {
           />
 
           {contextHolder}
+
           <Button
             color="danger"
             variant="solid"
@@ -61,6 +76,20 @@ const ProfilePage: React.FC = () => {
             id="logoutBtn"
           >
             {t('logout')}
+          </Button>
+
+          {/* <Button
+            color="danger"
+            variant="solid"
+            onClick={onEraseClick}
+            id="logoutBtn"
+          >
+            {t('profile.erase')}
+          </Button> */}
+
+          <br />
+          <Button icon={<SyncOutlined />} variant="solid" onClick={sync}>
+            {t('sync')}
           </Button>
         </div>
       )}

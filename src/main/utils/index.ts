@@ -2,6 +2,7 @@
 import { app } from 'electron';
 import { URL } from 'url';
 import path from 'path';
+import { DateTime } from 'luxon';
 import { config } from '../config';
 
 export const DATA_FILE_NAME = 'encrypted_data.json';
@@ -27,8 +28,6 @@ export function getDataFilePath(): string {
   return path.join(userDataPath, DATA_FILE_NAME);
 }
 
-export function getEnvFilePath(isPackaged: boolean): string {
-  return isPackaged
-    ? path.join(process.resourcesPath, '.env')
-    : path.resolve(process.cwd(), '.env');
+export function getCurrentTimeStamp(): string {
+  return DateTime.now().toMillis().toString();
 }

@@ -1,77 +1,81 @@
+// google-auth.ts
+
 import express from 'express';
 import { BrowserWindow } from 'electron';
-import { saveToken, saveUserData } from '../session';
+import {
+  getRefreshToken,
+  saveRefreshToken,
+  saveToken,
+  saveUserData,
+} from '../session';
 
-const VERCEL_AUTH_URL = 'https://jukeis-authenticator.vercel.app/api/auth';
-const GOOGLE_API_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
-const PORT = 51739;
+export const VERCEL_AUTH_URL =
+  'https://jukeis-authenticator.vercel.app/api/auth';
+export const VERCEL_AUTH_TOKEN_URL =
+  'https://jukeis-authenticator.vercel.app/api/get-token';
+export const GOOGLE_API_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
+export const PORT = 51739;
 
-export function startGoogleLoginFlow(
-  mainWindow: BrowserWindow,
-  download_drive_data: () => void,
-) {
-  mainWindow.webContents.send('show-loader', true);
+export type UserInfo = {
+  name: string;
+  picture: string;
+};
 
-  const app = express();
-  const server = app.listen(PORT);
+export async function refreshAccessToken(): Promise<string> {
+  const refresh_token = await getRefreshToken();
+  const url = VERCEL_AUTH_TOKEN_URL + `?refresh_token=${refresh_token}`;
+  const response = await fetch(url);
+  const responseBody = await response.json();
+  return responseBody.access_token;
+}
 
-  app.get('/', async (req, res) => {
-    const accessToken = req.query.access_token as string;
-
-    await saveToken(accessToken);
-
-    const { userInfo } = await getUserInfo(accessToken);
-
-    await saveUserData(JSON.stringify(userInfo));
-
-    if (accessToken) {
-      download_drive_data();
-
-      mainWindow!.webContents.send('login-success', {
-        accessToken,
-        userData: userInfo,
-      });
-
-      authWindow.close();
-    }
+export async function getUserInfo(access_token: string): Promise<UserInfo> {
+  const res = await fetch(GOOGLE_API_URL, {
+    headers: { Authorization: `Bearer ${access_token}` },
   });
+  return await res.json();
+}
 
-  const authWindow = new BrowserWindow({
+export function openLoginWindow(
+  refreshToken: string | null,
+  onClose: () => void,
+): BrowserWindow {
+  const win = new BrowserWindow({
     width: 500,
     height: 600,
-
     show: false,
     webPreferences: {
       nodeIntegration: true,
     },
   });
 
-  authWindow.on('closed', () => {
-    server.close();
-  });
+  win.on('closed', onClose);
 
-  authWindow.loadURL(VERCEL_AUTH_URL);
+  let loginUrl = VERCEL_AUTH_URL;
+  if (!refreshToken) {
+    loginUrl += '?request_consent=true';
+  }
 
-  authWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('show-loader', false);
-    authWindow.show();
-  });
+  win.loadURL(loginUrl);
+  return win;
 }
 
-async function getUserInfo(access_token: string) {
-  await saveToken(access_token);
+export function waitForOAuthResponse(): Promise<{
+  access_token: string;
+  refresh_token?: string;
+}> {
+  return new Promise((resolve) => {
+    const app = express();
+    const server = app.listen(PORT);
 
-  const userInfoResponse = await fetch(GOOGLE_API_URL, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
+    app.get('/', (req, res) => {
+      const access_token = req.query.access_token as string;
+      const refresh_token = req.query.refresh_token as string | undefined;
+
+      res.send('Login successful. You may close this window.');
+
+      resolve({ access_token, refresh_token });
+      server.close();
+    });
   });
-
-  const userInfo = await userInfoResponse.json();
-
-  return {
-    userInfo,
-    access_token,
-  };
 }

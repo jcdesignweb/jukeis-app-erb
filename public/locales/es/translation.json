@@ -10,6 +10,9 @@
   "ok": "ok",
   "cancel": "Cancelar",
   "logout": "Salir",
+  "synchronizing": "Sincronizando",
+  "sync": "Sincronizar",
+
   "home": {
     "title":"Contraseñas almacenadas",
     "no-keys": "No se encontraron claves almacenadas",
@@ -19,7 +22,8 @@
     "filter-by-origin": "Filtrar por descripción"
   },
   "profile": {
-    "title": "Mi perfil"
+    "title": "Mi perfil",
+    "erase": "Borrar datos"
   },
   "groups": {
     "addGroupButton": "Crear Grupo",

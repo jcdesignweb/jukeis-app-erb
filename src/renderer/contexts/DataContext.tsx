@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
-import { Group, StoredData, StoreKey } from '../../main/data/storage';
+import { Group, StoredData, StoreKey } from '../../main/models';
 
 interface State {
   keys: StoreKey[];
@@ -53,8 +53,15 @@ export const KeysProvider: React.FC<{ children: React.ReactNode }> = ({
       const loadedData: StoredData =
         await window.electron.ipcRenderer.invoke('load-keys');
       dispatch({ type: 'LOAD_SUCCESS', payload: loadedData });
-    } catch (e: any) {
-      dispatch({ type: 'LOAD_ERROR', payload: e.message });
+    } catch (e: unknown) {
+      let message = 'Unknown error';
+      if (e instanceof Error) {
+        message = e.message;
+      } else {
+        console.error('unkown error', e);
+      }
+
+      dispatch({ type: 'LOAD_ERROR', payload: message });
     }
   };
 
