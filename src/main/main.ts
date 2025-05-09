@@ -29,6 +29,7 @@ import { registerKeyHandlers } from './ipc/keys.listener';
 import { registerSessionHandlers } from './ipc/sessions.listener';
 import { registerGroupHandlers } from './ipc/group.listener';
 import { registerAppHandlers } from './ipc/app.listener';
+import { registerSyncHandlers } from './ipc/sync.listener';
 
 process.on('uncaughtException', (err) => {
   log(`Uncaught Exception: ${err.stack || err}`);
@@ -60,17 +61,9 @@ i18n
     },
   });
 
-eventBus.on('sync-requested', async () => {
-  if (!mainWindow) return;
-
-  sendToRenderer(IPC_CHANNELS.SYNCHRONIZING, true);
-  await sync_drive_data();
-  sendToRenderer(IPC_CHANNELS.SYNCHRONIZING, false);
-});
-
-function sendToRenderer(channel: string, data: any) {
+function sendToRenderer(channel: string, value: any) {
   if (mainWindow?.webContents) {
-    mainWindow.webContents.send(channel, data);
+    mainWindow.webContents.send(channel, value);
   }
 }
 
@@ -135,6 +128,7 @@ const createWindow = async () => {
   registerGroupHandlers();
   registerSessionHandlers(mainWindow);
   registerAppHandlers();
+  registerSyncHandlers(sendToRenderer);
 
   mainWindow.setTitle(config.appTitle);
   mainWindow.loadURL(resolveHtmlPath('index.html'));

@@ -12,6 +12,7 @@ const INIT_VALUE_DATA = EncripterCryptoSingleton.getInstance().encrypt(
  * sync keys into Google drive, this will we executed after adding or removing a key or group
  */
 export async function sync_drive_data(): Promise<boolean> {
+  console.info('Cloud sync data process');
   try {
     const googleDrive = new GoogleDriveStorage();
 

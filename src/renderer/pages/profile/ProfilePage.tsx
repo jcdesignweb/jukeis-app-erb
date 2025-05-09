@@ -7,6 +7,7 @@ import logoutModal from '../../utils/modal-logout';
 
 import './ProfilePage.css';
 import { UserInfo } from '../../../main/google/gmail-auth';
+import { SyncOutlined } from '@ant-design/icons';
 
 const ProfilePage: React.FC = () => {
   const [user, setUser] = useState<{ name: string; picture: string } | null>(
@@ -44,6 +45,10 @@ const ProfilePage: React.FC = () => {
     });
   };
 
+  const sync = () => {
+    window.electron.ipcRenderer.sendMessage('cloud-sync');
+  };
+
   const onEraseClick = () => {
     window.electron.ipcRenderer.sendMessage('erase-data');
   };
@@ -73,13 +78,18 @@ const ProfilePage: React.FC = () => {
             {t('logout')}
           </Button>
 
-          <Button
+          {/* <Button
             color="danger"
             variant="solid"
             onClick={onEraseClick}
             id="logoutBtn"
           >
             {t('profile.erase')}
+          </Button> */}
+
+          <br />
+          <Button icon={<SyncOutlined />} variant="solid" onClick={sync}>
+            {t('sync')}
           </Button>
         </div>
       )}

@@ -24,10 +24,6 @@ const HomePage: React.FC<HomeScreenProps> = () => {
     setIsModalOpen(true);
   };
 
-  const sync = () => {
-    window.electron.ipcRenderer.sendMessage('cloud-sync');
-  };
-
   return (
     <div>
       <Button
@@ -46,7 +42,7 @@ const HomePage: React.FC<HomeScreenProps> = () => {
       <h2 style={{ marginTop: 24 }}>{useTranslation().t('home.title')}</h2>
       <KeyList />
 
-      <button onClick={sync}>Sync</button>
+      {/* <button onClick={sync}>Sync</button> */}
     </div>
   );
 };

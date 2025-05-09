@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { List, Typography, Input, Button, Space, Select, Modal } from 'antd';
 import {
   EyeInvisibleOutlined,
@@ -7,7 +7,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { t } from 'i18next';
-import { StoreKey, Group, StoredData } from '../../../../main/models';
+import { Group } from '../../../../main/models';
 import { deleteItemModal } from '../../../utils/modal-delete-item';
 import { useDataContext } from '../../../contexts/DataContext';
 
@@ -75,41 +75,35 @@ const KeyList: React.FC = () => {
 
   return (
     <>
-      {filteredKeysByGroup.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            gap: '16px',
-            flexDirection: 'row',
-          }}
+      <div
+        style={{
+          display: 'flex',
+          gap: '16px',
+          flexDirection: 'row',
+        }}
+      >
+        <Input
+          placeholder={t('home.filter-by-origin')}
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{ width: 200 }}
+        />
+        <Select
+          placeholder={t('home.filter-by-group')}
+          onChange={handleGroupFilterChange}
+          value={selectedGroupFilter}
+          style={{ width: 200 }}
         >
-          <Input
-            placeholder={t('home.filter-by-origin')}
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            style={{ width: 200 }}
-          />
-          <Select
-            placeholder={t('home.filter-by-group')}
-            onChange={handleGroupFilterChange}
-            value={selectedGroupFilter}
-            style={{ width: 200 }}
-          >
-            <Select.Option value={undefined}>
-              {t('home.all-groups')}
+          <Select.Option value={undefined}>
+            {t('home.all-groups')}
+          </Select.Option>
+          {uniqueGroups.map((group) => (
+            <Select.Option key={group.id} value={group.id}>
+              {group.name}
             </Select.Option>
-            {uniqueGroups.map((group) => (
-              <Select.Option key={group.id} value={group.id}>
-                {group.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </div>
-      )}
-
-      {filteredKeysByGroup.length === 0 && (
-        <Typography.Paragraph>{t('home.no-keys')}</Typography.Paragraph>
-      )}
+          ))}
+        </Select>
+      </div>
 
       {contextHolder}
 

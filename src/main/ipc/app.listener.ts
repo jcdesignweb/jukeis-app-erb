@@ -5,8 +5,6 @@ import { localStorage } from '../data/local-storage';
 
 export function registerAppHandlers() {
   ipcMain.handle('cloud-sync', async () => {
-    console.log('Cloud sync started.');
-
     eventBus.emit('sync-requested');
   });
 

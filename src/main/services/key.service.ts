@@ -14,8 +14,6 @@ export async function addNewKey(newKey: StoreKey) {
     keys: updatedKeys,
   };
 
-  console.log('updatedStoredData', updatedStoredData);
-
   try {
     await localStorage.save(updatedStoredData);
   } catch (error) {
