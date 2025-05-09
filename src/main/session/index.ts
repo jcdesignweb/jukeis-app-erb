@@ -42,7 +42,7 @@ export async function getToken(): Promise<string> {
   return encrypter.decrypt(encrypted);
 }
 
-export async function clearToken() {
+export async function clearSessionsStored() {
   (await getStore()).delete('auth.token');
   (await getStore()).delete('auth.user');
 }

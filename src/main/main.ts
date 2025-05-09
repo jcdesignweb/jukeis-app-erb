@@ -10,25 +10,18 @@
  */
 
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
-import { getEnvFilePath, resolveHtmlPath } from './utils';
-import dotenv from 'dotenv';
+import { resolveHtmlPath } from './utils';
 
-import { initConfig } from './config';
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: getEnvFilePath(app.isPackaged) });
-}
-
-initConfig();
+import { config } from './config';
 
 import path from 'path';
 import MenuBuilder from './menu';
 import { localStorage } from './data/local-storage';
 import { dataInitializor, Group, StoredData } from './models';
-import { clearToken, getToken, getUserData } from './session';
+import { clearSessionsStored, getToken, getUserData } from './session';
 
 import { startGoogleLoginFlow, UserInfo } from './google/gmail-auth';
-import GoogleDriveStorage from './google/drive-storage';
+import GoogleDriveStorage from './google/google-drive-storage';
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -123,7 +116,7 @@ ipcMain.handle('delete-key', async (event, keyId) => {
 
 const getData = async () => {
   const loadedData = await localStorage.load();
-  storedData = loadedData || { groups: [], keys: [] };
+  storedData = loadedData ?? { groups: [], keys: [] };
   return storedData;
 };
 
@@ -136,7 +129,7 @@ ipcMain.on('open-external', (_, url: string) => {
 });
 
 ipcMain.handle('log-out', async () => {
-  await clearToken();
+  await clearSessionsStored();
 });
 
 ipcMain.on('start-google-login', async () => {
@@ -164,7 +157,7 @@ ipcMain.handle('add-group', async (_, newGroup: Group) => {
   const { groups } = await getData();
 
   if (groups !== undefined) {
-    const existsGroup = groups.find((g) => g.name === newGroup.name);
+    const existsGroup = groups.find((g: Group) => g.name === newGroup.name);
     if (existsGroup) {
       throw new Error('Group Alredy exists');
     }
@@ -187,15 +180,19 @@ ipcMain.handle('add-group', async (_, newGroup: Group) => {
 });
 
 ipcMain.handle('get-session', async () => {
-  const token = await getToken();
-  const userDataStr = await getUserData();
+  try {
+    const token = await getToken();
+    const userDataStr = await getUserData();
 
-  if (userDataStr) {
-    const userData: UserInfo = JSON.parse(userDataStr);
+    if (userDataStr) {
+      const userData: UserInfo = JSON.parse(userDataStr);
 
-    if (token && userData) {
-      return { token, userData };
+      if (token && userData) {
+        return { token, userData };
+      }
     }
+  } catch (error) {
+    console.error(error);
   }
 
   return null;
@@ -231,7 +228,7 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  app.setName('Jukeis');
+  app.setName(config.appTitle);
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -245,7 +242,7 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
-    title: 'Jukeis',
+    title: config.appTitle,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -254,7 +251,7 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.setTitle('Jukeis');
+  mainWindow.setTitle(config.appTitle);
   mainWindow.loadURL(resolveHtmlPath('index.html'));
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {

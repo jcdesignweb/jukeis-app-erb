@@ -1,6 +1,5 @@
-import { getToken } from '../../session';
 import { localStorage } from '../local-storage';
-import GoogleDriveStorage from '../../google/drive-storage';
+import GoogleDriveStorage from '../../google/google-drive-storage';
 import { EncripterCryptoSingleton } from '../../security/encrypter.singleton';
 import { TimestampSync } from './TimeStampSync';
 import { dataInitializor, StoredData } from '../../models';

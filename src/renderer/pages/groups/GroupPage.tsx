@@ -26,7 +26,11 @@ const GroupPage: React.FC<GroupScreenProps> = () => {
 
   return (
     <div id="group-page">
-      <Button onClick={handleAddGroupOnClick} style={{ float: 'right' }}>
+      <Button
+        type="primary"
+        onClick={handleAddGroupOnClick}
+        style={{ float: 'right' }}
+      >
         {useTranslation().t('groups.addGroupButton')}
       </Button>
       <br />

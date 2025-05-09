@@ -1,7 +1,6 @@
-import { writeFile } from 'fs/promises';
 import { drive } from '@googleapis/drive';
 import { OAuth2Client } from 'google-auth-library';
-import { DATA_FILE_NAME, getDataFilePath } from '../utils';
+import { DATA_FILE_NAME } from '../utils';
 import { refreshAccessToken } from './gmail-auth';
 import { getToken, saveToken } from '../session';
 
