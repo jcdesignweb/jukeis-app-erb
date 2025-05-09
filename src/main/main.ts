@@ -11,29 +11,24 @@
 
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
 import { resolveHtmlPath } from './utils';
-
 import { config } from './config';
-
 import path from 'path';
 import MenuBuilder from './menu';
-import { localStorage } from './data/local-storage';
-import { dataInitializor, Group, StoredData } from './models';
-import { clearSessionsStored, getToken, getUserData } from './session';
-
-import { startGoogleLoginFlow, UserInfo } from './google/gmail-auth';
-import GoogleDriveStorage from './google/google-drive-storage';
-
+import { getToken, getUserData } from './session';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
-
 import { log } from './utils/logger';
-
 import es from '../../public/locales/es/translation.json';
 import en from '../../public/locales/en/translation.json';
-
 import { sync_drive_data } from './data/sync';
+import { eventBus } from './ipc/event-bus';
+import { IPC_CHANNELS } from './ipc/channels';
+import { registerKeyHandlers } from './ipc/keys.listener';
+import { registerSessionHandlers } from './ipc/sessions.listener';
+import { registerGroupHandlers } from './ipc/group.listener';
+import { registerAppHandlers } from './ipc/app.listener';
 
 process.on('uncaughtException', (err) => {
   log(`Uncaught Exception: ${err.stack || err}`);
@@ -44,7 +39,6 @@ process.on('unhandledRejection', (reason) => {
 });
 
 let mainWindow: BrowserWindow | null = null;
-let storedData: StoredData = dataInitializor;
 
 i18n
   .use(HttpApi)
@@ -66,136 +60,22 @@ i18n
     },
   });
 
-const sync = async () => {
+eventBus.on('sync-requested', async () => {
   if (!mainWindow) return;
-  mainWindow.webContents.send('cloud-synchronizing', true);
+
+  sendToRenderer(IPC_CHANNELS.SYNCHRONIZING, true);
   await sync_drive_data();
-
-  mainWindow.webContents.send('cloud-synchronizing', false);
-};
-
-ipcMain.handle('cloud-sync', async () => {
-  console.log('Cloud sync started.');
-
-  await sync();
+  sendToRenderer(IPC_CHANNELS.SYNCHRONIZING, false);
 });
 
-ipcMain.handle('erase-data', async () => {
-  const googleDrive = new GoogleDriveStorage();
-  await googleDrive.removeFile();
-
-  localStorage.deleteLocalFile();
-});
-
-ipcMain.handle('add-new-key', async (event, newKey) => {
-  const storedData: StoredData = (await localStorage.load()) || {
-    groups: [],
-    keys: [],
-  };
-
-  const updatedKeys = [...(storedData.keys ?? []), newKey];
-
-  const updatedStoredData: StoredData = {
-    ...storedData,
-    keys: updatedKeys,
-  };
-
-  try {
-    await localStorage.save(updatedStoredData);
-    await sync();
-  } catch (error) {
-    console.error('Error stoing a new key:', error);
+function sendToRenderer(channel: string, data: any) {
+  if (mainWindow?.webContents) {
+    mainWindow.webContents.send(channel, data);
   }
-});
-
-ipcMain.handle('delete-key', async (event, keyId) => {
-  const result = await localStorage.deleteKey(keyId);
-  await sync();
-  return result;
-});
-
-const getData = async () => {
-  const loadedData = await localStorage.load();
-  storedData = loadedData ?? { groups: [], keys: [] };
-  return storedData;
-};
-
-ipcMain.handle('load-keys', async () => {
-  return await getData();
-});
+}
 
 ipcMain.on('open-external', (_, url: string) => {
   shell.openExternal(url);
-});
-
-ipcMain.handle('log-out', async () => {
-  await clearSessionsStored();
-});
-
-ipcMain.on('start-google-login', async () => {
-  if (!mainWindow) {
-    throw new Error('windows is not defined');
-  }
-
-  console.log('start-google-login');
-
-  const userInfo = await startGoogleLoginFlow(mainWindow);
-
-  await sync();
-  mainWindow.webContents.send('login-success', {
-    userData: userInfo,
-  });
-});
-
-ipcMain.handle('delete-group', async (_, id: string) => {
-  const result = await localStorage.deleteGroup(id);
-  await sync();
-  return result;
-});
-
-ipcMain.handle('add-group', async (_, newGroup: Group) => {
-  const { groups } = await getData();
-
-  if (groups !== undefined) {
-    const existsGroup = groups.find((g: Group) => g.name === newGroup.name);
-    if (existsGroup) {
-      throw new Error('Group Alredy exists');
-    }
-  }
-
-  const updatedGroups = [...(storedData.groups ?? []), newGroup];
-  const updatedStoredData: StoredData = {
-    ...storedData,
-    groups: updatedGroups,
-  };
-
-  try {
-    await localStorage.save(updatedStoredData);
-
-    await sync();
-    return updatedGroups;
-  } catch (error) {
-    console.error('Storing Group Error', error);
-  }
-});
-
-ipcMain.handle('get-session', async () => {
-  try {
-    const token = await getToken();
-    const userDataStr = await getUserData();
-
-    if (userDataStr) {
-      const userData: UserInfo = JSON.parse(userDataStr);
-
-      if (token && userData) {
-        return { token, userData };
-      }
-    }
-  } catch (error) {
-    console.error(error);
-  }
-
-  return null;
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -250,6 +130,11 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+
+  registerKeyHandlers();
+  registerGroupHandlers();
+  registerSessionHandlers(mainWindow);
+  registerAppHandlers();
 
   mainWindow.setTitle(config.appTitle);
   mainWindow.loadURL(resolveHtmlPath('index.html'));

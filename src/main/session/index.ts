@@ -2,7 +2,7 @@ import { EncripterCryptoSingleton } from '../security/encrypter.singleton';
 
 const encrypter = EncripterCryptoSingleton.getInstance();
 
-const getStore = async () => {
+export const getStore = async () => {
   const mod = await import('electron-store');
   const Store = mod.default;
   const store = new Store();
@@ -40,9 +40,4 @@ export async function getToken(): Promise<string> {
   if (!encrypted) throw new Error('token is missing');
 
   return encrypter.decrypt(encrypted);
-}
-
-export async function clearSessionsStored() {
-  (await getStore()).delete('auth.token');
-  (await getStore()).delete('auth.user');
 }

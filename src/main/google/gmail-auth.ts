@@ -79,31 +79,3 @@ export function waitForOAuthResponse(): Promise<{
     });
   });
 }
-
-export async function startGoogleLoginFlow(
-  mainWindow: BrowserWindow,
-): Promise<UserInfo> {
-  mainWindow.webContents.send('show-loader', true);
-
-  const refreshToken = await getRefreshToken();
-
-  const authWindow = openLoginWindow(refreshToken, () => {
-    mainWindow.webContents.send('show-loader', false);
-  });
-
-  authWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('show-loader', false);
-    authWindow.show();
-  });
-
-  const { access_token, refresh_token } = await waitForOAuthResponse();
-
-  const userInfo = await getUserInfo(access_token);
-
-  await saveToken(access_token);
-  if (refresh_token) await saveRefreshToken(refresh_token);
-  await saveUserData(JSON.stringify(userInfo));
-
-  authWindow.close();
-  return userInfo;
-}
