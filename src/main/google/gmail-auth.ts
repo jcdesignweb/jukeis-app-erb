@@ -8,6 +8,7 @@ import {
   saveToken,
   saveUserData,
 } from '../session';
+import TokenManager from '../security/TokenManager';
 
 export const VERCEL_AUTH_URL =
   'https://jukeis-authenticator.vercel.app/api/auth';
@@ -26,7 +27,11 @@ export async function refreshAccessToken(): Promise<string> {
   const url = VERCEL_AUTH_TOKEN_URL + `?refresh_token=${refresh_token}`;
   const response = await fetch(url);
   const responseBody = await response.json();
-  return responseBody.access_token;
+
+  const accessToken = responseBody.access_token;
+  await TokenManager.getInstance().setAccessToken(accessToken).persistence();
+
+  return accessToken;
 }
 
 export async function getUserInfo(access_token: string): Promise<UserInfo> {

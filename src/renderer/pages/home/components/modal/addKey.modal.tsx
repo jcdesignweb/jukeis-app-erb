@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PlusOutlined } from '@ant-design/icons';
 import { Group } from '../../../../../main/models';
 import { useDataContext } from '../../../../contexts/DataContext';
+import { Channels } from '../../../../../main/ipc/channels';
 
 export type AddKeyModalProps = {
   isModalOpen: boolean;
@@ -79,7 +80,7 @@ export const AddKeyModal: React.FC<AddKeyModalProps> = ({
 
     try {
       const groups = await window.electron.ipcRenderer.invoke<Group[]>(
-        'add-group',
+        Channels.ADD_GROUP,
         newGroup,
       );
 

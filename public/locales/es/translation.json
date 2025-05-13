@@ -12,7 +12,13 @@
   "logout": "Salir",
   "synchronizing": "Sincronizando",
   "sync": "Sincronizar",
-
+  "login": {
+    "titleForRegister": "Registro de clave",
+    "titleForLogin": "Ingrese su contraseña",
+    "inputPasswordHint": "Contraseña",
+    "buttonPasswordAccept": "Aceptar",
+    "initWithGmail": "Iniciar sesión con Gmail"
+  },
   "home": {
     "title":"Contraseñas almacenadas",
     "no-keys": "No se encontraron claves almacenadas",
@@ -23,7 +29,8 @@
   },
   "profile": {
     "title": "Mi perfil",
-    "erase": "Borrar datos"
+    "erase": "Borrar datos",
+    "erase-password": "Borrar Clave"
   },
   "groups": {
     "addGroupButton": "Crear Grupo",

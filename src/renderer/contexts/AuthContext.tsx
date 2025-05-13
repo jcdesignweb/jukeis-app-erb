@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  login: () => void;
+  setAuthenticated: () => void;
   logout: () => void;
 };
 
@@ -13,7 +13,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = () => setIsAuthenticated(true);
+  const setAuthenticated = () => setIsAuthenticated(true);
   const logout = () => {
     setIsAuthenticated(false);
     window.electron.ipcRenderer.sendMessage('log-out');
@@ -21,16 +21,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const checkSession = async () => {
-      const session = await window.electron.ipcRenderer.invoke('get-session');
-      const authenticated = session !== null;
-      setIsAuthenticated(authenticated);
+      try {
+        const session = await window.electron.ipcRenderer.invoke('get-session');
+        const authenticated = session !== null;
+        setIsAuthenticated(authenticated);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     checkSession();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, setAuthenticated, logout }}>
       {children}
     </AuthContext.Provider>
   );

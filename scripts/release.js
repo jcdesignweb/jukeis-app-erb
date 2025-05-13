@@ -29,5 +29,5 @@ else if (args.includes('--patch')) releaseAs = 'patch';
   execSync('git add release/app/package.json');
   execSync('git commit --amend --no-edit');
 
-  console.log(`✅ version ${rootPkg.version} successgfully`);
+  console.log(`✅ version ${rootPkg.version} successfully`);
 })();

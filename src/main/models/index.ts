@@ -23,6 +23,19 @@ export interface StoredData {
   keys: StoreKey[];
   deletedKeys?: Tombstone[];
   deletedGroups?: Tombstone[];
+  auth?: {
+    salt: string;
+    hash: string;
+  };
+}
+
+export interface AuthData {
+  auth?: {
+    salt: string;
+    hash: string;
+  };
 }
 
 export const dataInitializor: StoredData = { groups: [], keys: [] };
+
+export const authDataInitializor: AuthData = {};

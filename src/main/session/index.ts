@@ -1,4 +1,4 @@
-import { EncripterCryptoSingleton } from '../security/encrypter.singleton';
+import { EncripterCryptoSingleton } from '../security/EncripterSingleton';
 
 const encrypter = EncripterCryptoSingleton.getInstance();
 
