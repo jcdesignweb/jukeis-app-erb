@@ -1,30 +1,67 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { getCurrentTimeStamp, getDataFilePath } from '../utils';
-import { EncripterCryptoSingleton } from '../security/encrypter.singleton';
+import {
+  DATA_AUTH_FILE_NAME,
+  getCurrentTimeStamp,
+  getFilePath,
+} from '../utils';
+import { EncripterCryptoSingleton } from '../security/EncripterSingleton';
 import { CryptoAdapter } from '../security/CryptoAdapter';
-import { StoredData } from '../models';
+import {
+  AuthData,
+  dataInitializor,
+  authDataInitializor,
+  StoredData,
+} from '../models';
 
-const dataFilePath = path.resolve(getDataFilePath());
+const dataFilePath = path.resolve(getFilePath());
+const authFilePath = path.resolve(getFilePath(DATA_AUTH_FILE_NAME));
 
-export class LocalStorage {
+export enum LocalFileType {
+  AUTH_FILE,
+  DATA_FILE,
+}
+
+class LocalStorage {
   private encrypter: CryptoAdapter = EncripterCryptoSingleton.getInstance();
 
-  async load(): Promise<StoredData | null> {
+  async load(): Promise<StoredData> {
     try {
       const encryptedData = await fs.readFile(dataFilePath, 'utf-8');
       const decrypted = this.encrypter.decrypt(encryptedData);
       return JSON.parse(decrypted);
     } catch (error) {
       console.error(`[LocalStorage] Failed to load data:`, error);
-      return null;
+      return dataInitializor;
+    }
+  }
+
+  async loadAuthData(): Promise<AuthData> {
+    try {
+      const encryptedData = await fs.readFile(authFilePath, 'utf-8');
+      const decrypted = this.encrypter.decrypt(encryptedData);
+      return JSON.parse(decrypted);
+    } catch (error) {
+      console.error(`[LocalStorage] Failed to load data:`, error);
+      return authDataInitializor;
+    }
+  }
+
+  async saveAuth(data: AuthData): Promise<void> {
+    try {
+      const str = JSON.stringify(data, null, 2);
+      const encrypted = this.encrypter.encrypt(str);
+      await fs.writeFile(authFilePath, encrypted, 'utf-8');
+    } catch (error) {
+      console.error(`[LocalStorage] Failed to save data:`, error);
+      throw error;
     }
   }
 
   async save(data: StoredData): Promise<void> {
     try {
-      const json = JSON.stringify(data, null, 2);
-      const encrypted = this.encrypter.encrypt(json);
+      const str = JSON.stringify(data, null, 2);
+      const encrypted = this.encrypter.encrypt(str);
       await fs.writeFile(dataFilePath, encrypted, 'utf-8');
     } catch (error) {
       console.error(`[LocalStorage] Failed to save data:`, error);
@@ -53,9 +90,12 @@ export class LocalStorage {
     return dataFilePath;
   }
 
-  deleteLocalFile() {
+  deleteLocalFile(fileType = LocalFileType.DATA_FILE) {
+    const filepath =
+      fileType === LocalFileType.DATA_FILE ? dataFilePath : authFilePath;
+
     try {
-      fs.rm(dataFilePath);
+      fs.rm(filepath);
     } catch (error) {
       console.error(`[LocalStorage] Failed to save file from Drive:`, error);
       throw error;

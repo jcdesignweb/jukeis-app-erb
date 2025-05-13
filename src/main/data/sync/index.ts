@@ -1,6 +1,6 @@
 import { localStorage } from '../local-storage';
 import GoogleDriveStorage from '../../google/google-drive-storage';
-import { EncripterCryptoSingleton } from '../../security/encrypter.singleton';
+import { EncripterCryptoSingleton } from '../../security/EncripterSingleton';
 import { TimestampSync } from './TimeStampSync';
 import { dataInitializor, StoredData } from '../../models';
 

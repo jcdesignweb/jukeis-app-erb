@@ -1,5 +1,5 @@
 import { sync_drive_data } from '../data/sync';
-import { IPC_CHANNELS } from './channels';
+import { Channels } from './channels';
 import { eventBus } from './event-bus';
 
 export function registerSyncHandlers(
@@ -11,11 +11,11 @@ export function registerSyncHandlers(
     if (isSync) return;
 
     isSync = true;
-    sendToRenderer(IPC_CHANNELS.SYNCHRONIZING, isSync);
+    sendToRenderer(Channels.SYNCHRONIZING, isSync);
 
     await sync_drive_data();
 
     isSync = false;
-    sendToRenderer(IPC_CHANNELS.SYNCHRONIZING, isSync);
+    sendToRenderer(Channels.SYNCHRONIZING, isSync);
   });
 }

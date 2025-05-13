@@ -22,14 +22,12 @@ import HttpApi from 'i18next-http-backend';
 import { log } from './utils/logger';
 import es from '../../public/locales/es/translation.json';
 import en from '../../public/locales/en/translation.json';
-import { sync_drive_data } from './data/sync';
-import { eventBus } from './ipc/event-bus';
-import { IPC_CHANNELS } from './ipc/channels';
 import { registerKeyHandlers } from './ipc/keys.listener';
 import { registerSessionHandlers } from './ipc/sessions.listener';
 import { registerGroupHandlers } from './ipc/group.listener';
 import { registerAppHandlers } from './ipc/app.listener';
 import { registerSyncHandlers } from './ipc/sync.listener';
+import { Channels } from './ipc/channels';
 
 process.on('uncaughtException', (err) => {
   log(`Uncaught Exception: ${err.stack || err}`);
@@ -148,7 +146,7 @@ const createWindow = async () => {
     const token = await getToken();
 
     if (token) {
-      mainWindow!.webContents.send('login-success', {
+      sendToRenderer(Channels.LOGIN_SUCCESS, {
         token,
         userData: await getUserData(),
       });

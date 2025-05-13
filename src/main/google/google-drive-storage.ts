@@ -3,15 +3,13 @@ import { OAuth2Client } from 'google-auth-library';
 import { DATA_FILE_NAME } from '../utils';
 import { refreshAccessToken } from './gmail-auth';
 import { getToken, saveToken } from '../session';
+import { CloudStorage } from './CloudStorage';
+import Cloud from './Cloud';
 
-interface CloudStorage {
-  downloadFile(): void;
-  uploadFile(encryptedData: string): void;
-  removeFile(): void;
-}
-
-export default class GoogleDriveStorage implements CloudStorage {
-  constructor() {}
+export default class GoogleDriveStorage extends Cloud implements CloudStorage {
+  constructor() {
+    super();
+  }
 
   protected async getAccessToken() {
     const accessToken = await getToken();
@@ -33,25 +31,26 @@ export default class GoogleDriveStorage implements CloudStorage {
       });
 
       const existingFiles = listResponse.data.files;
+      const existsFile = existingFiles?.filter(
+        (f) => f.name === DATA_FILE_NAME,
+      );
 
-      if (existingFiles![0]) {
-        const file = existingFiles![0];
+      if (!existsFile || existsFile.length == 0) return null;
 
-        const fileId = file.id as string;
+      const fileId = existsFile[0].id as string;
 
-        try {
-          const res = await driveV3.files.get(
-            { fileId, alt: 'media' },
-            { responseType: 'arraybuffer' },
-          );
+      try {
+        const res = await driveV3.files.get(
+          { fileId, alt: 'media' },
+          { responseType: 'arraybuffer' },
+        );
 
-          const buffer = Buffer.from(res.data as ArrayBuffer);
+        const buffer = Buffer.from(res.data as ArrayBuffer);
 
-          return buffer;
-        } catch (error) {
-          console.error('Error downloading file from Drive:', error);
-          throw error;
-        }
+        return buffer;
+      } catch (error) {
+        console.error('Error downloading file from Drive:', error);
+        throw error;
       }
     });
   }
@@ -60,6 +59,9 @@ export default class GoogleDriveStorage implements CloudStorage {
     return this.tryWithRefresh(async () => {
       const access_token = await this.getAccessToken();
 
+      const driveV3 = drive({ version: 'v3', auth: access_token });
+
+      /*
       const driveV3 = drive({ version: 'v3', auth: access_token });
 
       const listResponse = await driveV3.files.list({
@@ -75,6 +77,9 @@ export default class GoogleDriveStorage implements CloudStorage {
       if (existingFiles && existingFiles.length > 0) {
         fileIdToUpdate = existingFiles[0].id;
       }
+      */
+
+      const fileIdToUpdate = await this.getFileId(access_token, DATA_FILE_NAME);
 
       const requestBody: {
         name: string;
@@ -142,21 +147,5 @@ export default class GoogleDriveStorage implements CloudStorage {
         console.log(`file ${fileId} was deleted from Google Drive`);
       }
     });
-  }
-
-  protected async tryWithRefresh<T>(fn: () => Promise<T>): Promise<T> {
-    try {
-      return await fn();
-    } catch (error: any) {
-      if (error.response?.status === 401) {
-        console.warn('Access token expired, refreshing...');
-
-        const newAcessToken = await refreshAccessToken();
-        await saveToken(newAcessToken);
-
-        return await fn();
-      }
-      throw error;
-    }
   }
 }

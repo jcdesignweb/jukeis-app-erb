@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import { config } from '../config';
 
 export const DATA_FILE_NAME = 'encrypted_data.json';
+export const DATA_AUTH_FILE_NAME = 'encrypted_auth_data.json';
 
 export function resolveHtmlPath(htmlFileName: string) {
   if (config.isDev) {
@@ -18,14 +19,12 @@ export function resolveHtmlPath(htmlFileName: string) {
 }
 
 export const rootFolder = (): string => {
-  const projectRoot = process.cwd();
-
-  return projectRoot;
+  return process.cwd();
 };
 
-export function getDataFilePath(): string {
+export function getFilePath(file = DATA_FILE_NAME): string {
   const userDataPath = app.getPath('userData');
-  return path.join(userDataPath, DATA_FILE_NAME);
+  return path.join(userDataPath, file);
 }
 
 export function getCurrentTimeStamp(): string {

@@ -1,7 +1,8 @@
 import GoogleDriveStorage from './google-drive-storage';
 import { drive } from '@googleapis/drive';
-import { getToken, saveToken } from '../session';
+import { getToken } from '../session';
 import { refreshAccessToken } from './gmail-auth';
+import { DATA_FILE_NAME } from '../utils';
 
 jest.mock('../config', () => ({
   config: {
@@ -46,7 +47,7 @@ describe('GoogleDriveStorage', () => {
     it('downloads file successfully', async () => {
       mockListFiles.mockResolvedValue({
         data: {
-          files: [{ id: 'file-id', name: 'data.json' }],
+          files: [{ id: 'file-id', name: DATA_FILE_NAME }],
         },
       });
 
@@ -131,7 +132,6 @@ describe('GoogleDriveStorage', () => {
       const result = await (storage as any).tryWithRefresh(failingFn);
 
       expect(refreshAccessToken).toHaveBeenCalled();
-      expect(saveToken).toHaveBeenCalledWith('new-token');
       expect(result).toBe('ok');
     });
 
