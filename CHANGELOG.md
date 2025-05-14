@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.4.0...v1.6.0) (2025-05-14)
+
+
+### Features
+
+* Onboarding with login/creation modals, minor changes and some structural changes ([1eeabcc](https://github.com/jcdesignweb/jukeis-app-erb/commit/1eeabcc0d3aba386617cae13adabbca312e33e10))
+
+
+### Bug Fixes
+
+* release tags ([1cb7a86](https://github.com/jcdesignweb/jukeis-app-erb/commit/1cb7a8632ab2d2e3e49009d5fdc10b79f86dc8a5))
+
 ### [1.5.1](https://github.com/jcdesignweb/jukeis-app-erb/compare/v1.4.0...v1.5.1) (2025-05-09)
 
 
